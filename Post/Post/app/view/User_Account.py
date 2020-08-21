@@ -16,7 +16,6 @@ from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required
 )
-
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
@@ -24,17 +23,17 @@ def login():
         password = request.form['password']
         try:
             user_info = User.query.filter_by(Userid = Userid).first()
-            if user_info.Userid != Userid or user_info.password != password:
-                return jsonify({
-                    "msg": "Bad username or password"
-                }), 401
-            elif user_info.password == password:
+            if user_info.Userid == Userid and User.check_password(password):
                 session['userid'] = user_info.Userid
                 return redirect(url_for('index'))
             else:
-                return 'Failed Login'
+                return jsonify({
+                    "msg": "Bad username or password"
+                }), 401
         except:
-            return 'Failed Login'
+            return jsonify({
+                "msg": "Bad username or password"
+            }), 401
     return render_template('login.html')
 
 @app.route('/register', methods=['POST', 'GET'])
