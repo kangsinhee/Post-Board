@@ -1,0 +1,37 @@
+<header>
+    {% if user %}
+    <a> Hello </a> <b>{{ user }}</b> <a>!</a>
+    <a href="/logout">로그아웃 </a>
+    {% else %}
+    <a href="/login">로그인</a>
+    <a href="/register">회원가입</a>
+    {% endif %}
+    <hr>
+</header>
+<div>
+    <p><a href="{{ url_for('add') }}">게시물 작성</a></p>
+    <table>
+        <thead>
+        <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>닉네임</th>
+            <th>날짜</th>
+            <th>수정</th>
+            <th>삭제</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i in post.items %}
+        <tr>
+            <td>{{ i.uuid }}</td>
+            <td>{{ i.title }}</td>
+            <td>{{ i.writer }} </td>
+            <td>{{ i.created_at }}</td>
+            <td><a href="{{ url_for('edit', uuid=i.uuid) }}"> 수정 </a></td>
+            <td><a href="{{ url_for('delete', uuid=i.uuid) }}"> 삭제 </a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
