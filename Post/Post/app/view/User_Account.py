@@ -23,7 +23,7 @@ def login():
         password = request.form['password']
         try:
             user_info = User.query.filter_by(Userid = Userid).first()
-            if user_info.Userid == Userid and User.check_password(password):
+            if user_info.Userid == Userid and user_info.check_password(password):
                 session['userid'] = user_info.Userid
                 return redirect(url_for('index'))
             else:

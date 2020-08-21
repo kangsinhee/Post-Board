@@ -17,7 +17,7 @@ def add():
     if request.method == 'POST':
         now = datetime.datetime.now()
         title, content = request.form['title'], request.form['content']
-        post = Post(title, content, now)
+        post = Post(title, content, now, 'add_soon')
         db.session.add(post)
         return redirect(url_for('index'))
     return render_template('add.html', title='작성하기')
