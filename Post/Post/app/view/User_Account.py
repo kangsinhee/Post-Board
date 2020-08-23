@@ -8,6 +8,7 @@ from flask import (
 )
 from Post.app import app, db
 from Post.app.models import User
+from Post.app import view
 from flask_jwt_extended import (
     JWTManager,
     get_jwt_claims,

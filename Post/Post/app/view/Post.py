@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, session, jsonify
-from Post.app import app, db
+from Post.app import app, db, jwt
 from Post.app.models import Post
 from Post.app.models import User
 import datetime
@@ -8,7 +8,7 @@ import datetime
 def index():
     user = session.get('userid', None)
     post = request.args.get('page', type=int, default=1)
-    post_list = Post.query.order_by(Post.created_at.desc())
+    post_list = Post.query.order_by(Post.uuid.desc())
     Post_list = post_list.paginate(post, per_page=7)
     return render_template("index.html", post=Post_list, user = user)
 
@@ -17,7 +17,7 @@ def add():
     if request.method == 'POST':
         now = datetime.datetime.now()
         title, content = request.form['title'], request.form['content']
-        post = Post(title, content, now, 'add_soon')
+        post = Post(title, content, now, '123')
         db.session.add(post)
         return redirect(url_for('index'))
     return render_template('add.html', title='작성하기')

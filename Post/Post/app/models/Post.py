@@ -6,7 +6,7 @@ class Post(db.Model):
     uuid = db.Column(db.Integer, nullable=False, primary_key=True, unique=True, autoincrement=True)
     title = db.Column(db.String(64), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.Date, nullable=True)
 
     writer = db.Column(db.String(45), db.ForeignKey('user.nickname'))
 

@@ -1,10 +1,10 @@
 <header>
     {% if user %}
     <a> Hello </a> <b>{{ user }}</b> <a>!</a>
-    <a href="/logout">로그아웃 </a>
+    <a href="{{ url_for('logout') }}">로그아웃 </a>
     {% else %}
-    <a href="/login">로그인</a>
-    <a href="/register">회원가입</a>
+    <a href="{{ url_for('login') }}">로그인</a>
+    <a href="{{ url_for('register') }}">회원가입</a>
     {% endif %}
     <hr>
 </header>
@@ -34,4 +34,43 @@
         {% endfor %}
         </tbody>
     </table>
+    <ul>
+        {% if post.has_prev %}
+        <li>
+            <a href="?page={{ post.prev_num }}">이전</a>
+        </li>
+        {% else %}
+        <li>
+            <a tabindex="-1" aria-disabled="true" href="#">이전</a>
+        </li>
+        {% endif %}
+
+        {% for page_num in post.iter_pages() %}
+        {% if page_num %}
+        {% if page_num != post.page %}
+        <li>
+            <a href="?page={{ page_num }}">{{ page_num }}</a>
+        </li>
+        {% else %}
+        <li aria-current="page">
+            <a href="#">{{ page_num }}</a>
+        </li>
+        {% endif %}
+        {% else %}
+        <li>
+            <a class="page-link" href="#">...</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        <!-- 다음페이지 -->
+        {% if post.has_next %}
+        <li>
+            <a href="?page={{ post.next_num }}">다음</a>
+        </li>
+        {% else %}
+        <li>
+            <a tabindex="-1" aria-disabled="true" href="#">다음</a>
+        </li>
+        {% endif %}
+    </ul>
 </div>

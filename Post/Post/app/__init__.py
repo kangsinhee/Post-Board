@@ -14,5 +14,5 @@ app = create_app(LocalDBConfig, DevLevelAppconfig)
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
-from Post.app.view import Post, User_Account
-from Post.app.models import Post, User
+from Post.app import view
+from Post.app import models
