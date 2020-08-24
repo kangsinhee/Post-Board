@@ -18,7 +18,7 @@ def login():
             if user_info.check_password(password):
                 session['userid'] = user_info.Userid
                 accesstoken = create_access_token(identity = user_info.Userid)
-                return redirect(url_for('index'))
+                return redirect(url_for('index')), accesstoken
             else:
                 return jsonify({
                     "msg": "Bad username or password"
@@ -46,3 +46,24 @@ def logout():
     session.pop('userid', None)
     print("logout [ %s ]" % user)
     return redirect(url_for('index'))
+
+@app.route('/exit', methods=['POST', 'GET'])
+def exit():
+    user = session.get('userid', None)
+    user_info = User.query.filter_by(Userid=user).first()
+    if request.method == 'POST':
+        password = request.form['password']
+        try:
+            if user_info.check_password(password):
+                db.session.delete(user_info)
+                session.pop('userid', None)
+                return redirect(url_for('index'))
+            else:
+                return jsonify({
+                    "msg": "incorrect password"
+                }), 401
+        except:
+            return jsonify({
+                "msg" : "incorrect password"
+            }), 401
+    return render_template('exit.html', user = user_info.Userid)

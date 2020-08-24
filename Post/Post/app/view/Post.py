@@ -14,32 +14,40 @@ def index():
 
 @app.route('/add', methods=['POST', 'GET'])
 def add():
-    if request.method == 'POST':
-        now = datetime.datetime.now()
-        user = session.get('userid', None)
-        title, content = request.form['title'], request.form['content']
-        post = Post(title, content, now, user)
-        db.session.add(post)
-        return redirect(url_for('index'))
-    return render_template('add.html', title='작성하기')
+    user = session.get('userid', None)
+    if user != None:
+        if request.method == 'POST':
+            now = datetime.datetime.now()
+            user = session.get('userid', None)
+            title, content = request.form['title'], request.form['content']
+            post = Post(title, content, now, user)
+            db.session.add(post)
+            return redirect(url_for('index'))
+        return render_template('add.html', title='작성하기')
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/edit/<int:uuid>', methods=['POST', 'GET'])
 def edit(uuid):
     user = session.get('userid', None)
-    if user == None:
-        return redirect(url_for('index'))
+    owner = Post.query.filter_by(uuid=uuid).first()
+    if user != owner.writer:
+        return redirect(url_for('login'))
     else:
         post = Post.query.get(uuid)
         if request.method == 'POST':
-            user = session.get('userid', None)
             post.title = request.form['title']
             post.content = request.form['content']
-            post.writer = user
             return redirect(url_for('index'))
     return render_template('add.html', title = "수정하기", note = post)
 
-@app.route('/delete/<int:uuid>', methods=['POST', 'GET', 'DELETE'])
+@app.route('/delete/<int:uuid>', methods=['GET'])
 def delete(uuid):
-    post = Post.query.get(uuid)
-    db.session.delete(post)
-    return redirect(url_for('index'))
+    user = session.get('userid', None)
+    owner = Post.query.filter_by(uuid=uuid).first()
+    if user != owner.writer:
+        return redirect(url_for('login'))
+    else:
+        post = Post.query.get(uuid)
+        db.session.delete(post)
+        return redirect(url_for('index'))

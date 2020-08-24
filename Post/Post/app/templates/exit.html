@@ -1,0 +1,21 @@
+<html>
+    <head> <title>Exit</title> </head>
+<body>
+<div>
+    <div>
+        <h3>계정 삭제</h3>
+    </div>
+    <b> > 계정 삭제후 다시 되돌릴수 없습니다. </b>
+    <div>
+        <form method="POST">
+            <a> [ <b>{{ user }}</b> ] 계정을 정말 삭제 하겠습니까?</a>
+            <a> 패스워드를 입력해주세요. </a>
+            <div>
+                <label for="password">패스워드</label>
+                <input type="password" id="password" name="password" placeholder="패스워드"/>
+            </div>
+            <button type="submit">삭제</button>
+        </form>
+    </div>
+</div>
+</body>
