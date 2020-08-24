@@ -1,21 +1,12 @@
 from flask import (
-    render_template,
-    request,
-    redirect,
-    url_for,
-    session,
-    jsonify
+    render_template, request, redirect, url_for,
+    session, jsonify
 )
 from Post.app import app, db
-from Post.app.models import User
-from Post.app import view
+from Post.app.models import Post, User
 from flask_jwt_extended import (
-    JWTManager,
-    get_jwt_claims,
-    create_refresh_token,
-    create_access_token,
-    get_jwt_identity,
-    jwt_required
+    JWTManager, create_refresh_token,
+    create_access_token, get_jwt_identity, jwt_required
 )
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -24,8 +15,9 @@ def login():
         password = request.form['password']
         try:
             user_info = User.query.filter_by(Userid = Userid).first()
-            if user_info.Userid == Userid and user_info.check_password(password):
+            if user_info.check_password(password):
                 session['userid'] = user_info.Userid
+                accesstoken = create_access_token(identity = user_info.Userid)
                 return redirect(url_for('index'))
             else:
                 return jsonify({

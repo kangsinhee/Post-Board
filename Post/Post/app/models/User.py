@@ -16,11 +16,7 @@ class User(db.Model):
     def __init__(self, Userid, password, nickname):
         self.Userid = Userid
         self.nickname = nickname
-
         self.set_password(password)
-
-    def __repr__(self):
-        return f"User('[self.Userid]', '[self.nickname]')"
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

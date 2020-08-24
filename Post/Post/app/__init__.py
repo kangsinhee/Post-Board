@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+
 def create_app(*config_cls) -> Flask:
     app = Flask(__name__)
     for config in config_cls:
