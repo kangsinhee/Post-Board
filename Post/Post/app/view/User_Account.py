@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     JWTManager, create_refresh_token,
     create_access_token, get_jwt_identity, jwt_required
 )
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/login/', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         Userid = request.form['Userid']
@@ -18,7 +18,7 @@ def login():
             if user_info.check_password(password):
                 session['userid'] = user_info.Userid
                 accesstoken = create_access_token(identity = user_info.Userid)
-                return redirect(url_for('index')), accesstoken
+                return redirect(url_for('index'))
             else:
                 return jsonify({
                     "msg": "Bad username or password"

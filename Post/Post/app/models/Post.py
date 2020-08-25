@@ -8,7 +8,7 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.Date, nullable=True)
 
-    writer = db.Column(db.String(45), db.ForeignKey('user.nickname'))
+    writer = db.Column(db.String(45), db.ForeignKey('user.nickname'), default='(알수없음)')
 
     def __init__(self, title, content, created_at, writer):
         self.title = title
