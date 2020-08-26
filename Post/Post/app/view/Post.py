@@ -20,7 +20,7 @@ def add():
             now = datetime.datetime.now()
             user = session.get('userid', None)
             title, content = request.form['title'], request.form['content']
-            post = Post(title, content, now, user)
+            post = Post(title, content, now, user)  #수정필요
             db.session.add(post)
             return redirect(url_for('index'))
         return render_template('add.html', title='작성하기')
@@ -30,11 +30,10 @@ def add():
 @app.route('/edit/<int:uuid>', methods=['POST', 'GET'])
 def edit(uuid):
     user = session.get('userid', None)
-    owner = Post.query.filter_by(uuid=uuid).first()
-    if user != owner.writer:
+    post = Post.query.get(uuid)
+    if user != post.writer:
         return redirect(url_for('login'))
     else:
-        post = Post.query.get(uuid)
         if request.method == 'POST':
             post.title = request.form['title']
             post.content = request.form['content']

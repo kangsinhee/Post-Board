@@ -48,13 +48,19 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/exit', methods=['POST', 'GET'])
-def exit():
+def delete_account():
     user = session.get('userid', None)
     user_info = User.query.filter_by(Userid=user).first()
+
     if request.method == 'POST':
         password = request.form['password']
         try:
             if user_info.check_password(password):
+                post = Post.query.filter_by(writer=user_info.Userid).all()
+                # 닉네임으로 수정 필요
+                for posts in post:
+                    posts.writer = '(알수없음)'
+
                 db.session.delete(user_info)
                 session.pop('userid', None)
                 return redirect(url_for('index'))

@@ -11,8 +11,6 @@ class User(db.Model):
     password = db.Column(db.String(100), nullable=False)
     nickname = db.Column(db.String(45), nullable=False, unique=True)
 
-    post = db.relationship('Post', backref='author', lazy=True)
-
     def __init__(self, Userid, password, nickname):
         self.Userid = Userid
         self.nickname = nickname

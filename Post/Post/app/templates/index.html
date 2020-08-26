@@ -2,7 +2,7 @@
     {% if user %}
     <a> Hello </a> <b>{{ user }}</b> <a>!</a>
     <a href="{{ url_for('logout') }}"> 로그아웃 </a>
-    <a href="{{ url_for('exit') }}"> 계정 삭제 </a>
+    <a href="{{ url_for('delete_account') }}"> 계정 삭제 </a>
     {% else %}
     <a href="{{ url_for('login') }}">로그인</a>
     <a href="{{ url_for('register') }}">회원가입</a>

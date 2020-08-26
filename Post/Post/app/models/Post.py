@@ -7,11 +7,13 @@ class Post(db.Model):
     title = db.Column(db.String(64), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.Date, nullable=True)
-
-    writer = db.Column(db.String(45), db.ForeignKey('user.nickname'), default='(알수없음)')
+    writer = db.Column(db.String(45))
 
     def __init__(self, title, content, created_at, writer):
         self.title = title
         self.content = content
         self.created_at = created_at
         self.writer = writer
+
+    def __repr__(self):
+        return "< title = %s, writer = %s >" % (self.title, self.writer)
