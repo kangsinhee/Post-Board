@@ -2,7 +2,7 @@ from flask import (
     render_template, request, redirect, url_for,
     session, jsonify
 )
-from Post.app import app, db
+from Post.app.extension import app, db, jwt
 from Post.app.models import Post, User
 from flask_jwt_extended import (
     JWTManager, create_refresh_token,

@@ -1,0 +1,22 @@
+<header>
+    {% if user %}
+    <ul style="display: flex; justify-content: space-between">
+        <li style="display: flex">
+            <a> 안녕하세요 <b>{{ user }}</b> 님</a>
+        </li>
+        <li style="display: flex; margin-right: 40px">
+            <a href="{{ url_for('logout') }}"> [ 로그아웃 ] </a>
+            <a href="{{ url_for('delete_account') }}"> [ 계정 삭제 ] </a>
+        </li>
+    </ul>
+    {% else %}
+    <ul style="display: flex; justify-content: space-between">
+        <li style="display: flex"> 로그인이 필요합니다 </li>
+        <li style="display: flex; margin-right: 40px">
+            <a href="{{ url_for('login') }}"> [ 로그인 ] </a>
+            <a href="{{ url_for('register') }}"> [ 회원가입 ] </a>
+        </li>
+    </ul>
+    {% endif %}
+</header>
+{% block content %}{% endblock %}

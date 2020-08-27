@@ -1,4 +1,4 @@
-from Post.app import db, jwt
+from Post.app.extension import db
 from werkzeug.security import (
     generate_password_hash,
     check_password_hash

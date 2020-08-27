@@ -1,25 +1,18 @@
-<header>
-    {% if user %}
-    <a> Hello <b>{{ user }}</b></a>
-    <a href="{{ url_for('logout') }}"> 로그아웃 </a>
-    {% else %}
-    <a href="{{ url_for('login') }}">로그인</a>
-    <a href="{{ url_for('register') }}">회원가입</a>
-    {% endif %}
-    <hr>
-</header>
+{% extends 'layout.html' %}
+{% block content %}
 <div>
     <b style="margin-left: 40px"> {{ post.title }} </b><hr>
     <ul style="display: flex; justify-content: space-between">
         <li style="font-size: 13px; display: flex"><a> {{ post.created_at }} </a></li>
-        <li style="font-size: 13px; display: flex; margin-right: 50px"><a> {{ post.writer }} </a> </li>
+        <li style="font-size: 13px; display: flex; margin-right: 40px"><a> {{ post.writer }} </a> </li>
     </ul><hr>
-    <p style="font-size: 15px;"> {{ post.content }} </p>
+
+    <p style="font-size: 15px; margin-left: 40px; margin-right: 40px"> {{ post.content }} </p>
     <br>
 
     <ul style="display: flex; justify-content: space-between">
         <li style="display: flex"><a href="{{ url_for('edit', uuid=post.uuid) }}"> 수정하기 </a></li>
-        <li style="display: flex; margin-right: 50px"><a href="{{ url_for('index') }}"> 목록으로 </a></li>
+        <li style="display: flex; margin-right: 40px"><a href="{{ url_for('index') }}"> 목록으로 </a></li>
     </ul>
 
     <hr>
@@ -39,3 +32,4 @@
     {% endif %}
     <hr>
 </div>
+{% endblock %}

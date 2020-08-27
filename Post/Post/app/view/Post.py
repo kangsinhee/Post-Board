@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, session, jsonify
-from Post.app import app, db, jwt
+from Post.app.extension import app, db, jwt
 from Post.app.models import Post, User
 import datetime
 from Post.app import view
@@ -24,7 +24,7 @@ def add():
             post = Post(title, content, now, user)  #수정필요
             db.session.add(post)
             return redirect(url_for('index'))
-        return render_template('add.html', title='작성하기')
+        return render_template('add.html', title='작성하기', user=user)
     else:
         return redirect(url_for('login'))
 
@@ -59,6 +59,5 @@ def viewpost(uuid):
 
     Previous = Post.query.filter(Post.uuid < post.uuid).order_by(Post.uuid.desc()).first()
     Next = Post.query.filter(Post.uuid > post.uuid).order_by(Post.uuid.asc()).first()
-    print(Previous)
     return render_template('Content.html', user=user, post=post, Previous=Previous, Next=Next)
 

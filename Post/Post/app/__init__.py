@@ -1,6 +1,4 @@
-from flask import Flask, session
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
+from flask import Flask
 
 def create_app(*config_cls) -> Flask:
     app = Flask(__name__)
@@ -8,12 +6,7 @@ def create_app(*config_cls) -> Flask:
         app.config.from_object(config)
     return app
 
-from Post.config.db_config import LocalDBConfig
-from Post.config.app_config import DevLevelAppconfig
 
-app = create_app(LocalDBConfig, DevLevelAppconfig)
-db = SQLAlchemy(app)
-jwt = JWTManager(app)
 
 from Post.app import view
 from Post.app import models

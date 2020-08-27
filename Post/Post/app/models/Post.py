@@ -1,4 +1,4 @@
-from Post.app import db
+from Post.app.extension import db
 
 class Post(db.Model):
     __tablename__ = "post"
