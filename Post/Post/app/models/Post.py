@@ -16,4 +16,4 @@ class Post(db.Model):
         self.writer = writer
 
     def __repr__(self):
-        return "< title = %s, writer = %s >" % (self.title, self.writer)
+        return "< uuid = %s title = %s, writer = %s >" % (self.uuid, self.title, self.writer)

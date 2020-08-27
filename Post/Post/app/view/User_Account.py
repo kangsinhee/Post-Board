@@ -19,6 +19,7 @@ def login():
 
             user_info = User.query.filter_by(Userid = Userid).first()
             if user_info.check_password(password):
+                session.clear()
                 session['userid'] = user_info.Userid
                 accesstoken = create_access_token(identity = user_info.Userid)
                 return redirect(url_for('index'))
@@ -46,7 +47,7 @@ def register():
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
     user = session.get('userid', None)
-    session.pop('userid', None)
+    session.clear()
     print("logout [ %s ]" % user)
     return redirect(url_for('index'))
 
