@@ -8,12 +8,15 @@ from flask_jwt_extended import (
     JWTManager, create_refresh_token,
     create_access_token, get_jwt_identity, jwt_required
 )
+import re
+
 @app.route('/login/', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        Userid = request.form['Userid']
-        password = request.form['password']
         try:
+            Userid = request.form['Userid']
+            password = request.form['password']
+
             user_info = User.query.filter_by(Userid = Userid).first()
             if user_info.check_password(password):
                 session['userid'] = user_info.Userid
@@ -47,7 +50,7 @@ def logout():
     print("logout [ %s ]" % user)
     return redirect(url_for('index'))
 
-@app.route('/exit', methods=['POST', 'GET'])
+@app.route('/delete_account', methods=['POST', 'GET'])
 def delete_account():
     user = session.get('userid', None)
     user_info = User.query.filter_by(Userid=user).first()

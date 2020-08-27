@@ -43,10 +43,17 @@ def edit(uuid):
 @app.route('/delete/<int:uuid>', methods=['GET'])
 def delete(uuid):
     user = session.get('userid', None)
-    owner = Post.query.filter_by(uuid=uuid).first()
-    if user != owner.writer:
+    post = Post.query.get(uuid)
+    if user != post.writer:
         return redirect(url_for('login'))
     else:
         post = Post.query.get(uuid)
         db.session.delete(post)
         return redirect(url_for('index'))
+
+@app.route('/post/<int:uuid>', methods=['POST', 'GET'])
+def viewpost(uuid):
+    user = session.get('userid', None)
+    post = Post.query.get(uuid)
+    back = Post.query.order_by(Post.uuid.desc()).first()
+    return render_template('Content.html', post = post, user = user, back = back)

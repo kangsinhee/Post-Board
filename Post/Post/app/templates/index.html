@@ -1,6 +1,6 @@
 <header>
     {% if user %}
-    <a> Hello </a> <b>{{ user }}</b> <a>!</a>
+    <a> Hello <b>{{ user }}</b></a>
     <a href="{{ url_for('logout') }}"> 로그아웃 </a>
     <a href="{{ url_for('delete_account') }}"> 계정 삭제 </a>
     {% else %}
@@ -10,6 +10,7 @@
     <hr>
 </header>
 <div>
+    <a> 총 게시물 수 : {{ post.total }}개</a>
     <p><a href="{{ url_for('add') }}">게시물 작성</a></p>
     <table>
         <thead>
@@ -26,7 +27,7 @@
         {% for i in post.items %}
         <tr>
             <td>{{ i.uuid }}</td>
-            <td>{{ i.title }}</td>
+            <td><a href="{{ url_for('viewpost', uuid=i.uuid) }}">{{ i.title }}</a></td>
             <td>{{ i.writer }} </td>
             <td>{{ i.created_at }}</td>
             <td><a href="{{ url_for('edit', uuid=i.uuid) }}"> 수정 </a></td>
