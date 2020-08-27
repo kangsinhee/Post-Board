@@ -1,0 +1,9 @@
+
+Post/Post/app/extension/__pycache__/__init__.cpython-38.pyc
+Post/Post/app/models/__pycache__/__init__.cpython-38.pyc
+Post/Post/app/models/__pycache__/Post.cpython-38.pyc
+Post/Post/app/models/__pycache__/user.cpython-38.pyc
+Post/Post/config/__pycache__/app_config.cpython-38.pyc
+Post/Post/config/__pycache__/db_config.cpython-38.pyc
+*.pyc
+*.pyc

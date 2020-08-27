@@ -6,7 +6,5 @@ def create_app(*config_cls) -> Flask:
         app.config.from_object(config)
     return app
 
-
-
 from Post.app import view
 from Post.app import models
