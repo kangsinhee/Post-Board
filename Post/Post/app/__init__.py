@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 
@@ -6,7 +6,6 @@ def create_app(*config_cls) -> Flask:
     app = Flask(__name__)
     for config in config_cls:
         app.config.from_object(config)
-    db.init_app(app)
     return app
 
 from Post.config.db_config import LocalDBConfig

@@ -3,6 +3,7 @@ from Post.app import app, db, jwt
 from Post.app.models import Post, User
 import datetime
 from Post.app import view
+from sqlalchemy import funcfilter, and_
 
 @app.route('/', methods=['GET'])
 def index():
@@ -55,5 +56,9 @@ def delete(uuid):
 def viewpost(uuid):
     user = session.get('userid', None)
     post = Post.query.get(uuid)
-    back = Post.query.order_by(Post.uuid.desc()).first()
-    return render_template('Content.html', post = post, user = user, back = back)
+
+    Previous = Post.query.filter(Post.uuid < post.uuid).order_by(Post.uuid.desc()).first()
+    Next = Post.query.filter(Post.uuid > post.uuid).order_by(Post.uuid.asc()).first()
+    print(Previous)
+    return render_template('Content.html', user=user, post=post, Previous=Previous, Next=Next)
+

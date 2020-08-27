@@ -18,10 +18,24 @@
     <br>
 
     <ul style="display: flex; justify-content: space-between">
-        <li style="display: flex"><a href="{{ url_for('edit', uuid= post.uuid) }}"> 수정하기 </a></li>
+        <li style="display: flex"><a href="{{ url_for('edit', uuid=post.uuid) }}"> 수정하기 </a></li>
         <li style="display: flex; margin-right: 50px"><a href="{{ url_for('index') }}"> 목록으로 </a></li>
     </ul>
 
-    <hr><a> 이전 게시물 </a>
-    <hr><a> 다음 게시물 </a><hr>
+    <hr>
+    <a> 이전글 : </a>
+    {% if Next != None %}
+        <a href="{{ url_for('viewpost', uuid=Next.uuid) }}"> {{ Next.title }} </a>
+    {% else %}
+        <b> 다음 게시물이 없습니다. </b>
+    {% endif %}
+
+    <hr>
+    <a> 다음글 : </a>
+    {% if Previous != None %}
+        <a href="{{ url_for('viewpost', uuid=Previous.uuid) }}"> {{ Previous.title }} </a>
+    {% else %}
+        <b> 이전 게시물이 없습니다. </b>
+    {% endif %}
+    <hr>
 </div>
