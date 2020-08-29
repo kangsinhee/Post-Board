@@ -1,6 +1,6 @@
 from flask import (
-    render_template, request, redirect, url_for,
-    session, jsonify
+    render_template, request, redirect,
+    url_for, session, jsonify, blueprints
 )
 from Post.app.extension import app, db, jwt
 from Post.app.models import Post, User
@@ -11,7 +11,7 @@ from flask_jwt_extended import (
 import re
 
 @app.route('/login/', methods=['POST', 'GET'])
-def login():
+def login(*args, **kwargs):
     if request.method == 'POST':
         try:
             Userid = request.form['Userid']
