@@ -63,7 +63,6 @@ def delete(uuid):
     if user != post.writer:
         return redirect(url_for('login'))
     else:
-        post = Post.query.get(uuid)
         db.session.delete(post)
         return redirect(url_for('index'))
 
@@ -104,4 +103,10 @@ def edit_comment(uuid, c_uuid):
 
 @app.route('/post/<int:uuid>/delete/<int:c_uuid>')
 def delete_comment(uuid, c_uuid):
-    user = session.get('useid', None)
+    user = session.get('userid', None)
+    comment = Comment.query.filter_by(uuid = c_uuid, post_id =  uuid).first()
+    if user != comment.nickname:
+        return redirect(url_for('login'))
+    else:
+        db.session.delete(comment)
+        return redirect(url_for('viewpost', uuid = uuid))
