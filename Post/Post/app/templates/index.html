@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-<div style="height: 275px; margin-left: 40px; margin-right: 40px; background-color: #f0f0f0">
+<div style="height: 275px; background-color: #f0f0f0">
     <a> 총 게시물 수 : {{ post.total }}개</a>
     <a href="{{ url_for('add') }}">[ 게시물 작성 ]</a><hr>
     <table>
@@ -29,7 +29,7 @@
     </table>
 </div>
 <div>
-    <ul style="display: flex">
+    <ul style="display: flex; padding-left: 0px; list-style: none">
         {% if post.has_prev %}
         <li style="display: flex">
             <a href="?page={{ post.prev_num }}">[ 이전 ]</a>

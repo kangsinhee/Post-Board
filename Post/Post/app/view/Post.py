@@ -6,6 +6,15 @@ from Post.app.extension import app, db, jwt
 from Post.app.models import Post, Comment
 import datetime
 from Post.app import view
+from functools import wraps
+
+# def logged_in(func):
+#     @wraps(func)
+#     def decorated_function(*args, **kwargs):
+#         if session.get('userid', None) is not None:
+#             return func(*args, **kwargs)
+#         else:
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -20,21 +29,22 @@ def viewpost(uuid):
     user = session.get('userid', None)
     post = Post.query.get(uuid)
     comment = Comment.query.filter_by(post_id = uuid).order_by(Comment.uuid.desc()).all()
+
     Previous = Post.query.filter(Post.uuid < post.uuid).order_by(Post.uuid.desc()).first()
     Next = Post.query.filter(Post.uuid > post.uuid).order_by(Post.uuid.asc()).first()
-
-    if request.method == 'POST':
-        now = datetime.datetime.now()
-        nickname = session.get('userid', None)
-        content = request.form['content']
-        if content != '':
-            comment = Comment(uuid, nickname, content, now)
-            db.session.add(comment)
-        else:
-            return jsonify({
-                "msg": "Please fill all blanks"
-            }), 401
-        return redirect((url_for('viewpost')))
+    if user != None:
+        if request.method == 'POST':
+            now = datetime.datetime.now()
+            userid = session.get('userid', None)
+            content = request.form['content']
+            if content != '':
+                comment = Comment(uuid, userid, content, now)
+                db.session.add(comment)
+            else:
+                return jsonify({
+                    "msg": "Please fill all blanks"
+                }), 401
+            return redirect(url_for('viewpost', uuid=uuid))
     return render_template('Content.html', user=user, post=post, comment = comment, Previous=Previous, Next=Next)
 
 @app.route('/add', methods=['POST', 'GET'])

@@ -1,49 +1,61 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div>
-    <b> {{ post.title }} </b><hr>
-    <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
-        <li style="font-size: 13px;"><a> {{ post.created_at }} </a></li>
-        <li style="font-size: 13px;"><a> {{ post.writer }} </a> </li>
-    </ul><hr>
+    <div>
+        <b> {{ post.title }} </b>
+        <a href="{{ url_for('edit', uuid=post.uuid) }}" style="text-decoration: none"> [ 수정하기 ] </a>
+        <a href="{{ url_for('index') }}" style="text-decoration: none"> [ 목록으로 ] </a><hr>
+        <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
+            <li style="font-size: 13px;"><a> {{ post.created_at }} </a></li>
+            <li style="font-size: 13px;"><a> {{ post.writer }} </a> </li>
+        </ul><hr>
 
-    <p style="font-size: 15px"> {{ post.content }} </p>
-    <br>
 
-    <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
-        <li><a href="{{ url_for('edit', uuid=post.uuid) }}" style="text-decoration: none"> 수정하기 </a></li>
-        <li><a href="{{ url_for('index') }}" style="text-decoration: none"> 목록으로 </a></li>
-    </ul>
+        <p style="font-size: 15px"> {{ post.content }} </p>
+        <br>
 
-    <hr>
-    <a> 이전글 : </a>
-    {% if Next != None %}
-        <a href="{{ url_for('viewpost', uuid=Next.uuid) }}" style="text-decoration: none"> {{ Next.title }} </a>
-    {% else %}
-        <b> 이전 게시물이 없습니다. </b>
-    {% endif %}
+        <hr>
+        <a> 이전글 : </a>
+        {% if Next != None %}
+            <a href="{{ url_for('viewpost', uuid=Next.uuid) }}" style="text-decoration: none"> {{ Next.title }} </a>
+        {% else %}
+            <b> 이전 게시물이 없습니다. </b>
+        {% endif %}
 
-    <hr>
-    <a> 다음글 : </a>
-    {% if Previous != None %}
-        <a href="{{ url_for('viewpost', uuid=Previous.uuid) }}" style="text-decoration: none"> {{ Previous.title }} </a>
-    {% else %}
-        <b> 다음 게시물이 없습니다. </b>
-    {% endif %}
-    <hr>
+        <hr>
+        <a> 다음글 : </a>
+        {% if Previous != None %}
+            <a href="{{ url_for('viewpost', uuid=Previous.uuid) }}" style="text-decoration: none"> {{ Previous.title }} </a>
+        {% else %}
+            <b> 다음 게시물이 없습니다. </b>
+        {% endif %}
+        <hr>
+    </div>
+    <div>
+        <form action="" method="post">
+            <div>
+                {% if user != None %}
+                    <b> [ {{ user }} ] </b>
+                    <label for = "content">댓글남기기</label><br>
+                    <textarea type="text" name="content" id="content", style="height: 60px; width: 500px"></textarea><br>
+                    <button type="submit">추가</button>
+                {% else %}
+                <b> 로그인이 필요합니다. </b>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div>
+        {% for item in comment %}
+        <li>
+            <acticle>
+                <b style="padding-right: 20px"> {{ item.nickname }} </b>
+                <a> {{ item.create_time }} </a>
+                <p> {{ item.content }} </p>
+            </acticle>
+        </li>
+        {% endfor %}
+    </div>
 </div>
-<div>
-    <form action="" method="post">
-        <div>
-            <label for = "content">댓글남기기</label><br>
-            <textarea type="text" name="content" id="content", style="height: 60px; width: 500px"></textarea>
-        </div>
-        <div>
-            <button type="submit">추가</button>
-        </div>
-    </form>
-</div>
-<div>
 
-</div>
 {% endblock %}
