@@ -14,3 +14,6 @@ class Comment(db.Model):
         self.nickname = nickname
         self.content = content
         self.create_time = create_time
+
+    def __repr__(self):
+        return "< uuid = %s, post_id = %s, writer = %s >" % (self.uuid, self.post_id, self.nickname)

@@ -24,6 +24,49 @@ def index():
     Post_list = post_list.paginate(post, per_page=7)
     return render_template("index.html", post=Post_list, user = user)
 
+@app.route('/add', methods=['POST', 'GET'])
+def add():
+    user = session.get('userid', None)
+    if user != None:
+        if request.method == 'POST':
+            now = datetime.datetime.now()
+            nickname = session.get('userid', None)  #수정필요
+            title, content = request.form['title'], request.form['content']
+            if title != '' and content != '':
+                post = Post(title, content, now, nickname)
+                db.session.add(post)
+            else:
+                return jsonify({
+                    "msg": "Please fill all blanks"
+                }), 401
+            return redirect(url_for('index'))
+        return render_template('add.html', title='작성하기', user=user)
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/post/<int:uuid>/edit', methods=['POST', 'GET'])
+def edit(uuid):
+    user = session.get('userid', None)
+    post = Post.query.get(uuid)
+    if user != post.writer:
+        return redirect(url_for('login'))
+    else:
+        if request.method == 'POST':
+            post.title, post.content = request.form['title'], request.form['content']
+            return redirect(url_for('index'))
+    return render_template('add.html', user=user, title = "수정하기", note = post)
+
+@app.route('/<int:uuid>/delete', methods=['GET'])
+def delete(uuid):
+    user = session.get('userid', None)
+    post = Post.query.get(uuid)
+    if user != post.writer:
+        return redirect(url_for('login'))
+    else:
+        post = Post.query.get(uuid)
+        db.session.delete(post)
+        return redirect(url_for('index'))
+
 @app.route('/post/<int:uuid>', methods=['POST', 'GET'])
 def viewpost(uuid):
     user = session.get('userid', None)
@@ -47,45 +90,18 @@ def viewpost(uuid):
             return redirect(url_for('viewpost', uuid=uuid))
     return render_template('Content.html', user=user, post=post, comment = comment, Previous=Previous, Next=Next)
 
-@app.route('/add', methods=['POST', 'GET'])
-def add():
+@app.route('/post/<int:uuid>/edit/<int:c_uuid>', methods=['POST', 'GET'])
+def edit_comment(uuid, c_uuid):
     user = session.get('userid', None)
-    if user != None:
-        if request.method == 'POST':
-            now = datetime.datetime.now()
-            nickname = session.get('userid', None)  #수정필요
-            title, content = request.form['title'], request.form['content']
-            if title != '' and content != '':
-                post = Post(title, content, now, nickname)
-                db.session.add(post)
-            else:
-                return jsonify({
-                    "msg": "Please fill all blanks"
-                }), 401
-            return redirect(url_for('index'))
-        return render_template('add.html', title='작성하기', user=user)
-    else:
-        return redirect(url_for('login'))
-
-@app.route('/edit/<int:uuid>', methods=['POST', 'GET'])
-def edit(uuid):
-    user = session.get('userid', None)
-    post = Post.query.get(uuid)
-    if user != post.writer:
+    comment = Comment.query.filter_by(uuid = c_uuid, post_id =  uuid).first()
+    if user != comment.nickname:
         return redirect(url_for('login'))
     else:
         if request.method == 'POST':
-            post.title, post.content = request.form['title'], request.form['content']
-            return redirect(url_for('index'))
-    return render_template('add.html', user=user, title = "수정하기", note = post)
+            comment.content = request.form['content']
+            return redirect(url_for('viewpost', uuid = uuid))
+    return render_template('Edit_comment.html', user=user)
 
-@app.route('/delete/<int:uuid>', methods=['GET'])
-def delete(uuid):
-    user = session.get('userid', None)
-    post = Post.query.get(uuid)
-    if user != post.writer:
-        return redirect(url_for('login'))
-    else:
-        post = Post.query.get(uuid)
-        db.session.delete(post)
-        return redirect(url_for('index'))
+@app.route('/post/<int:uuid>/delete/<int:c_uuid>')
+def delete_comment(uuid, c_uuid):
+    user = session.get('useid', None)

@@ -52,6 +52,8 @@
                 <b style="padding-right: 20px"> {{ item.nickname }} </b>
                 <a> {{ item.create_time }} </a>
                 <p> {{ item.content }} </p>
+                <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 수정 ] </a>
+                <a href="{{ url_for('delete_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 삭제 ]</a>
             </acticle>
         </li>
         {% endfor %}
