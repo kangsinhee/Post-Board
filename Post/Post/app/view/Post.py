@@ -8,14 +8,6 @@ import datetime
 from Post.app import view
 from functools import wraps
 
-# def logged_in(func):
-#     @wraps(func)
-#     def decorated_function(*args, **kwargs):
-#         if session.get('userid', None) is not None:
-#             return func(*args, **kwargs)
-#         else:
-
-
 @app.route('/', methods=['GET'])
 def index():
     user = session.get('userid', None)
@@ -51,22 +43,28 @@ def edit(uuid):
     if user != post.writer:
         return redirect(url_for('login'))
     else:
-        if request.method == 'POST':
+        if request.method == 'DELETE':
+            now = datetime.datetime.now()
             post.title, post.content = request.form['title'], request.form['content']
+            post.created_at = now
             return redirect(url_for('index'))
     return render_template('add.html', user=user, title = "수정하기", note = post)
 
-@app.route('/<int:uuid>/delete', methods=['GET'])
+@app.route('/post/<int:uuid>/delete', methods=['GET'])
 def delete(uuid):
     user = session.get('userid', None)
     post = Post.query.get(uuid)
+    comment = Comment.query.filter_by(post_id=uuid).all()
+
     if user != post.writer:
         return redirect(url_for('login'))
     else:
         db.session.delete(post)
+        for i in comment:
+            db.session.delete(i)
         return redirect(url_for('index'))
 
-@app.route('/post/<int:uuid>', methods=['POST', 'GET'])
+@app.route('/post/<int:uuid>', methods=['GET', 'POST'])
 def viewpost(uuid):
     user = session.get('userid', None)
     post = Post.query.get(uuid)
@@ -89,7 +87,7 @@ def viewpost(uuid):
             return redirect(url_for('viewpost', uuid=uuid))
     return render_template('Content.html', user=user, post=post, comment = comment, Previous=Previous, Next=Next)
 
-@app.route('/post/<int:uuid>/edit/<int:c_uuid>', methods=['POST', 'GET'])
+@app.route('/post/<int:uuid>/<int:c_uuid>', methods=['POST', 'GET'])
 def edit_comment(uuid, c_uuid):
     user = session.get('userid', None)
     comment = Comment.query.filter_by(uuid = c_uuid, post_id =  uuid).first()
@@ -101,7 +99,7 @@ def edit_comment(uuid, c_uuid):
             return redirect(url_for('viewpost', uuid = uuid))
     return render_template('Edit_comment.html', user=user)
 
-@app.route('/post/<int:uuid>/delete/<int:c_uuid>')
+@app.route('/post/<int:uuid>/delete/<int:c_uuid>', methods=['GET'])
 def delete_comment(uuid, c_uuid):
     user = session.get('userid', None)
     comment = Comment.query.filter_by(uuid = c_uuid, post_id =  uuid).first()

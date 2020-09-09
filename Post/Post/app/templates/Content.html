@@ -32,7 +32,7 @@
         <hr>
     </div>
     <div>
-        <form action="" method="post">
+        <form action="" method="POST">
             <div>
                 {% if user != None %}
                     <b> [ {{ user }} ] </b>
@@ -47,13 +47,15 @@
     </div>
     <div>
         {% for item in comment %}
-        <li>
-            <acticle>
-                <b style="padding-right: 20px"> {{ item.nickname }} </b>
+            <li>
+                <acticle>
+                    <b style="padding-right: 20px"> {{ item.nickname }} </b>
                 <a> {{ item.create_time }} </a>
-                <p> {{ item.content }} </p>
-                <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 수정 ] </a>
-                <a href="{{ url_for('delete_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 삭제 ]</a>
+                <p>
+                    {{ item.content }}<br>
+                    <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 수정 ] </a>
+                    <a href="{{ url_for('delete_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 삭제 ]</a>
+                <hr></p>
             </acticle>
         </li>
         {% endfor %}

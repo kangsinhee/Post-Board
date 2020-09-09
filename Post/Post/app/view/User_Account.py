@@ -1,59 +1,99 @@
 from flask import (
     render_template, request, redirect,
-    url_for, session, jsonify, blueprints
+    url_for, jsonify, blueprints
 )
 from Post.app.extension import app, db, jwt
-from Post.app.models import Post, User
+from Post.app.models import Post, User, Comment, Ben_list
 from flask_jwt_extended import (
-    JWTManager, create_refresh_token,
-    create_access_token, get_jwt_identity, jwt_required
+    JWTManager, set_refresh_cookies, create_refresh_token,
+    set_access_cookies, create_access_token, get_jwt_identity, jwt_required
 )
-import re
 
-@app.route('/login/', methods=['POST', 'GET'])
-def login(*args, **kwargs):
+@app.route('/login-test', methods=['POST'])
+def test():
+    info = request.get_json()
+    Userid = info['Userid']
+    Passwd = info['Passwd']
+
+    try:
+        user_info = User.query.get(Userid)
+    except:
+        resp = jsonify({'Please check your ID or password again.'})
+        return resp, 401
+    if user_info.check_password(Passwd):
+        access_token = create_access_token(identity=Userid)
+        refresh_token = create_refresh_token(identity=Userid)
+
+        resp = jsonify({'login': 'True'})
+        set_access_cookies(resp, access_token)
+        set_refresh_cookies(resp, refresh_token)
+
+        return resp, 200
+    else:
+        resp = jsonify({'login': 'False'})
+        return resp, 401
+
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
     if request.method == 'POST':
-        try:
             Userid = request.form['Userid']
-            password = request.form['password']
+            Passwd = request.form['password']
 
             user_info = User.query.filter_by(Userid = Userid).first()
-            if user_info.check_password(password):
-                session.clear()
-                session['userid'] = user_info.Userid
-                accesstoken = create_access_token(identity = user_info.Userid)
-                return redirect(url_for('index'))
+            if user_info.check_password(Passwd):
+                access_token = create_access_token(identity = Userid)
+                refresh_token = create_refresh_token(identity = Userid)
+
+                resp = jsonify({'login' : 'True'})
+                set_access_cookies(resp, access_token)
+                set_refresh_cookies(resp, refresh_token)
+
+                return resp, 200
             else:
-                return jsonify({
-                    "msg": "Bad username or password"
-                }), 401
-        except:
-            return jsonify({
-                "msg": "Bad username or password"
-            }), 401
+                resp = jsonify({'login' : 'False'})
+                return resp, 401
     return render_template('login.html')
+
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if request.method == 'POST':
-        Userid = request.form['Userid']
-        password = request.form['password']
-        nickname = request.form['nickname']
+        Userid = request.form.get("Userid")
+        password = request.form.get("password")
+        nickname = request.form.get("nickname")
+
         newUser = User(Userid=Userid, password=password, nickname=nickname)
         db.session.add(newUser)
-        return redirect(url_for('login'))
+        return redirect(url_for('login')), 301
     return render_template('register.html')
+
+
+@app.route('/register-test', methods=['POST', 'GET'])
+def register_test():
+    if request.method == 'POST':
+        Userid = request.form.get("Userid")
+        password = request.form.get("password")
+        nickname = request.form.get("nickname")
+        
+        ben_list = Ben_list.query.order_by(Ben_list.uuid.desc())
+        for ben_list in ben_list:
+            if nickname == ben_list.id:
+                return jsonify({"msg" : "This nickname is not available."})
+        newUser = User(Userid=Userid, password=password, nickname=nickname)
+        db.session.add(newUser)
+        return redirect(url_for('login')), 301
+    return render_template('register.html'), 200
+
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
-    user = session.get('userid', None)
-    session.clear()
-    print("logout [ %s ]" % user)
     return redirect(url_for('index'))
+
 
 @app.route('/delete_account', methods=['POST', 'GET'])
 def delete_account():
-    user = session.get('userid', None)
+
     user_info = User.query.filter_by(Userid=user).first()
 
     if request.method == 'POST':
@@ -61,13 +101,15 @@ def delete_account():
         try:
             if user_info.check_password(password):
                 post = Post.query.filter_by(writer=user_info.Userid).all()
+                comment = Comment.query.filter_by(nickname=user_info.Userid).all()
                 # 닉네임으로 수정 필요
-                for posts in post:
-                    posts.writer = '(알수없음)'
+                for user in post:
+                    user.writer = '(알수없음)'
+                for user in comment:
+                    user.nickname = '(알수없음)'
 
                 db.session.delete(user_info)
-                session.pop('userid', None)
-                return redirect(url_for('index'))
+                return redirect(url_for('index')), 301
             else:
                 return jsonify({
                     "msg": "incorrect password"
