@@ -8,51 +8,29 @@ from flask_jwt_extended import (
     JWTManager, set_refresh_cookies, create_refresh_token,
     set_access_cookies, create_access_token, get_jwt_identity, jwt_required
 )
-
-@app.route('/login-test', methods=['POST'])
-def test():
-    info = request.get_json()
-    Userid = info['Userid']
-    Passwd = info['Passwd']
-
-    try:
-        user_info = User.query.get(Userid)
-    except:
-        resp = jsonify({'Please check your ID or password again.'})
-        return resp, 401
-    if user_info.check_password(Passwd):
-        access_token = create_access_token(identity=Userid)
-        refresh_token = create_refresh_token(identity=Userid)
-
-        resp = jsonify({'login': 'True'})
-        set_access_cookies(resp, access_token)
-        set_refresh_cookies(resp, refresh_token)
-
-        return resp, 200
-    else:
-        resp = jsonify({'login': 'False'})
-        return resp, 401
-
+from Post.app.exception import AuthenticateFailed
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
             Userid = request.form['Userid']
             Passwd = request.form['password']
+            try:
+                user_info = User.query.get(Userid)
+                if user_info.check_password(Passwd):
+                    access_token = create_access_token(identity=Userid)
+                    refresh_token = create_refresh_token(identity=Userid)
 
-            user_info = User.query.filter_by(Userid = Userid).first()
-            if user_info.check_password(Passwd):
-                access_token = create_access_token(identity = Userid)
-                refresh_token = create_refresh_token(identity = Userid)
+                    resp = jsonify({'login': 'True'})
+                    set_access_cookies(resp, access_token)
+                    set_refresh_cookies(resp, refresh_token)
 
-                resp = jsonify({'login' : 'True'})
-                set_access_cookies(resp, access_token)
-                set_refresh_cookies(resp, refresh_token)
-
-                return resp, 200
-            else:
-                resp = jsonify({'login' : 'False'})
-                return resp, 401
+                    return resp, 200
+                else:
+                    resp = jsonify({'login': 'False'})
+                    return resp, 401
+            except:
+                raise AuthenticateFailed()
     return render_template('login.html')
 
 
@@ -79,7 +57,7 @@ def register_test():
         ben_list = Ben_list.query.order_by(Ben_list.uuid.desc())
         for ben_list in ben_list:
             if nickname == ben_list.id:
-                return jsonify({"msg" : "This nickname is not available."})
+                raise AuthenticateFailed()
         newUser = User(Userid=Userid, password=password, nickname=nickname)
         db.session.add(newUser)
         return redirect(url_for('login')), 301
@@ -111,11 +89,7 @@ def delete_account():
                 db.session.delete(user_info)
                 return redirect(url_for('index')), 301
             else:
-                return jsonify({
-                    "msg": "incorrect password"
-                }), 401
+                raise AuthenticateFailed()
         except:
-            return jsonify({
-                "msg" : "incorrect password"
-            }), 401
+            raise AuthenticateFailed()
     return render_template('exit.html', user = user_info.Userid)
