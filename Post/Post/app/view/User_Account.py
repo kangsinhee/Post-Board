@@ -4,11 +4,8 @@ from flask import (
 )
 from Post.app.extension import app, db, jwt
 from Post.app.models import Post, User, Comment, Ben_list
-from flask_jwt_extended import (
-    JWTManager, set_refresh_cookies, create_refresh_token,
-    set_access_cookies, create_access_token, get_jwt_identity, jwt_required
-)
 from Post.app.exception import AuthenticateFailed
+from Post.app.util.token_generator import generate_access_token, generate_refresh_token, decode_token
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -18,14 +15,9 @@ def login():
             try:
                 user_info = User.query.get(Userid)
                 if user_info.check_password(Passwd):
-                    access_token = create_access_token(identity=Userid)
-                    refresh_token = create_refresh_token(identity=Userid)
-
-                    resp = jsonify({'login': 'True'})
-                    set_access_cookies(resp, access_token)
-                    set_refresh_cookies(resp, refresh_token)
-
-                    return resp, 200
+                    generate_access_token(Userid)
+                    generate_refresh_token(Userid)
+                    return jsonify({"login" : "True"})
                 else:
                     resp = jsonify({'login': 'False'})
                     return resp, 401

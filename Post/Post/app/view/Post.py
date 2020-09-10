@@ -3,20 +3,20 @@ from flask import (
     url_for, session, jsonify, blueprints
 )
 from Post.app.extension import app, db, jwt
-from Post.app.models import Post, Comment
+from Post.app.models import Post, Comment, C_comment
 import datetime
-from Post.app import view
-from functools import wraps
+from Post.app.util.token_checker import token_checker
 
 @app.route('/', methods=['GET'])
 def index():
     user = session.get('userid', None)
-    post = request.args.get('page', type=int, default=1)
-    post_list = Post.query.order_by(Post.uuid.desc())
-    Post_list = post_list.paginate(post, per_page=7)
+    Page = request.args.get('page', type=int, default=1)
+    List = Post.query.order_by(Post.uuid.desc())
+    Post_list = List.paginate(Page, per_page=7)
     return render_template("index.html", post=Post_list, user = user)
 
 @app.route('/add', methods=['POST', 'GET'])
+@token_checker
 def add():
     user = session.get('userid', None)
     if user != None:
@@ -37,6 +37,7 @@ def add():
         return redirect(url_for('login'))
 
 @app.route('/post/<int:uuid>/edit', methods=['POST', 'GET'])
+@token_checker
 def edit(uuid):
     user = session.get('userid', None)
     post = Post.query.get(uuid)
@@ -51,6 +52,7 @@ def edit(uuid):
     return render_template('add.html', user=user, title = "수정하기", note = post)
 
 @app.route('/post/<int:uuid>/delete', methods=['GET'])
+@token_checker
 def delete(uuid):
     user = session.get('userid', None)
     post = Post.query.get(uuid)
@@ -65,6 +67,7 @@ def delete(uuid):
         return redirect(url_for('index'))
 
 @app.route('/post/<int:uuid>', methods=['GET', 'POST'])
+@token_checker
 def viewpost(uuid):
     user = session.get('userid', None)
     post = Post.query.get(uuid)
@@ -88,6 +91,7 @@ def viewpost(uuid):
     return render_template('Content.html', user=user, post=post, comment = comment, Previous=Previous, Next=Next)
 
 @app.route('/post/<int:uuid>/<int:c_uuid>', methods=['POST', 'GET'])
+@token_checker
 def edit_comment(uuid, c_uuid):
     user = session.get('userid', None)
     comment = Comment.query.filter_by(uuid = c_uuid, post_id =  uuid).first()
@@ -100,6 +104,7 @@ def edit_comment(uuid, c_uuid):
     return render_template('Edit_comment.html', user=user)
 
 @app.route('/post/<int:uuid>/delete/<int:c_uuid>', methods=['GET'])
+@token_checker
 def delete_comment(uuid, c_uuid):
     user = session.get('userid', None)
     comment = Comment.query.filter_by(uuid = c_uuid, post_id =  uuid).first()
