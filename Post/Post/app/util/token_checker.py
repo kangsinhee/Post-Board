@@ -7,8 +7,8 @@ from Post.config.app_config import DevLevelAppconfig
 from Post.app.exception import AuthenticateFailed, Unauthorized
 from Post.app.util.token_generator import decode_token
 
-def token_checker(func):
-    @wraps(func)
+def token_checker(f):
+    @wraps(f)
     def wrapper(*args, **kwargs):
         token = request.headers["Authorization"][7:]
         if token is not None:
@@ -19,6 +19,5 @@ def token_checker(func):
                 raise AuthenticateFailed
         else:
             raise AuthenticateFailed
-        return func(*args, **kwargs)
-
+        return f(*args, **kwargs)
     return wrapper

@@ -1,6 +1,6 @@
 from flask import (
     render_template, request, redirect,
-    url_for, jsonify, blueprints
+    url_for, jsonify, blueprints, make_response
 )
 from Post.app.extension import app, db, jwt
 from Post.app.models import Post, User, Comment, Ben_list
@@ -15,9 +15,11 @@ def login():
             try:
                 user_info = User.query.get(Userid)
                 if user_info.check_password(Passwd):
-                    generate_access_token(Userid)
-                    generate_refresh_token(Userid)
-                    return jsonify({"login" : "True"})
+                    resp = {
+                        'access_token' : generate_access_token(Userid),
+                        'refresh_token' : generate_refresh_token(Userid)
+                    }
+                    return make_response(jsonify(resp)), 201
                 else:
                     resp = jsonify({'login': 'False'})
                     return resp, 401
