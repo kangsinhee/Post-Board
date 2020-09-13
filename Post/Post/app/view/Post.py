@@ -86,11 +86,11 @@ def delete(uuid):
     if user != post.writer:
         return redirect(url_for('login'))
     else:
+        db.session.delete(post)
         for item in comment:
             db.session.delete(item)
         for item in c_comment:
             db.session.delete(item)
-        db.session.delete(post)
         return redirect(url_for('index'))
 
 @app.route('/post/<int:uuid>/comment/<int:c_uuid>/edit', methods=['POST', 'GET'])

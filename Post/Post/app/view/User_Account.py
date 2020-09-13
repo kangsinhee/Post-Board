@@ -3,7 +3,7 @@ from flask import (
     url_for, jsonify, blueprints, session
 )
 from Post.app.extension import app, db, jwt
-from Post.app.models import Post, User, Comment, Ben_list
+from Post.app.models import Post, User, Comment, C_comment
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
 from Post.app.util.Cookie_generator import generate_cookie
@@ -45,23 +45,6 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/register-test', methods=['POST', 'GET'])
-def register_test():
-    if request.method == 'POST':
-        Userid = request.form.get("Userid")
-        password = request.form.get("password")
-        nickname = request.form.get("nickname")
-        
-        ben_list = Ben_list.query.order_by(Ben_list.uuid.desc())
-        for ben_list in ben_list:
-            if nickname == ben_list.id:
-                raise AuthenticateFailed()
-        newUser = User(Userid=Userid, password=password, nickname=nickname)
-        db.session.add(newUser)
-        return redirect(url_for('login')), 301
-    return render_template('register.html'), 200
-
-
 @app.route('/logout', methods=['GET'])
 def logout():
     resp = make_response(redirect(url_for('index')))
@@ -83,12 +66,14 @@ def delete_account():
         try:
             if user_info.check_password(password):
                 post = Post.query.filter_by(writer=user_info.Userid).all()
-                comment = Comment.query.filter_by(nickname=user_info.Userid).all()
+                comment = Comment.query.filter_by(nickname=user_info.nickname).all()
+                c_comment = C_comment.query.filter_by(nickname=user_info.nickname).all()
                 for user in post:
                     user.writer = '(알수없음)'
                 for user in comment:
                     user.nickname = '(알수없음)'
-
+                for user in c_comment:
+                    user.nickname = '(알수없음)'
                 db.session.delete(user_info)
                 session.clear()
                 return redirect(url_for('index')), 301

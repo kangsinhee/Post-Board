@@ -13,20 +13,21 @@ def Auth_Validate(f):
             Access_cookie = request.cookies.get("Access_Token")
             Access_Token = decode_token(Access_cookie)
         except:
-            Refresh_cookie = request.cookies.get("Refresh_Token")
-            Refresh_Token = decode_token(Refresh_cookie)
-            if Refresh_Token is not None:
-                user = session.get('User', None)
-                user_info = User.query.filter_by(nickname = user).first()
+            try:
+                Refresh_cookie = request.cookies.get("Refresh_Token")
+                Refresh_Token = decode_token(Refresh_cookie)
+                if Refresh_Token != None:
+                    user = session.get('User', None)
+                    user_info = User.query.filter_by(nickname = user).first()
 
-                resp = make_response(redirect(url_for('index')))
-                Cookie = generate_cookie(resp)
-                Cookie.access_cookie(user_info.Userid)
+                    resp = make_response(redirect(url_for('index')))
+                    Cookie = generate_cookie(resp)
+                    Cookie.access_cookie(user_info.Userid)
 
-                return resp
-            else:
+                    return resp
+                else:
+                    raise AuthenticateFailed()
+            except:
                 raise AuthenticateFailed()
-
-        print(Access_Token)
         return f(*args, **kwargs)
     return wrapper

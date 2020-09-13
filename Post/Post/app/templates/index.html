@@ -3,15 +3,15 @@
 <div>
     <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
         <li><a> 총 {{ post.total }}개</a></li>
-        <li><a href="{{ url_for('add') }}" style="text-decoration: none; color: black">[ 게시물 작성 ]</a></li>
+        <li><a href="{{ url_for('add') }}" style="text-decoration: none; color: #6511f0"> 게시물 작성 </a></li>
     </ul>
     <table>
         <thead>
         <tr>
             <th width="50px">번호</th>
-            <th width="300px">제목</th>
-            <th width="80px">닉네임</th>
-            <th width="100px">날짜</th>
+            <th width="400px">제목</th>
+            <th width="150px">닉네임</th>
+            <th width="150px">날짜</th>
         </tr>
         </thead>
         <tbody>
@@ -63,7 +63,7 @@
         </li>
         {% else %}
         <li style="display: flex">
-            <a tabindex="-1" aria-disabled="true" href="#">[ 다음 ]</a>
+            <a tabindex="-1" aria-disabled="true" href="#" style="text-decoration: none; color: black">[ 다음 ]</a>
         </li>
         {% endif %}
     </ul>
