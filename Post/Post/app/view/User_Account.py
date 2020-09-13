@@ -1,11 +1,12 @@
 from flask import (
-    render_template, request, redirect,
-    url_for, jsonify, blueprints, make_response
+    render_template, request, redirect, make_response,
+    url_for, jsonify, blueprints, session
 )
 from Post.app.extension import app, db, jwt
 from Post.app.models import Post, User, Comment, Ben_list
 from Post.app.exception import AuthenticateFailed
-from Post.app.util.token_generator import generate_access_token, generate_refresh_token, decode_token
+from Post.app.util.Token_generator import decode_token
+from Post.app.util.Cookie_generator import generate_cookie
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -15,16 +16,19 @@ def login():
             try:
                 user_info = User.query.get(Userid)
                 if user_info.check_password(Passwd):
-                    resp = {
-                        'access_token' : generate_access_token(Userid),
-                        'refresh_token' : generate_refresh_token(Userid)
-                    }
-                    return make_response(jsonify(resp)), 201
+                    session.clear()
+                    resp = make_response(redirect(url_for('index')))
+                    Cookie = generate_cookie(resp)
+
+                    session['User'] = user_info.nickname
+                    Cookie.access_cookie(user_info.Userid)
+                    Cookie.refresh_cookie(user_info.Userid)
                 else:
-                    resp = jsonify({'login': 'False'})
-                    return resp, 401
+                    raise AuthenticateFailed()
             except:
                 raise AuthenticateFailed()
+            finally:
+                return resp
     return render_template('login.html')
 
 
@@ -58,19 +62,25 @@ def register_test():
     return render_template('register.html'), 200
 
 
-@app.route('/logout', methods=['POST', 'GET'])
+@app.route('/logout', methods=['GET'])
 def logout():
-    return redirect(url_for('index'))
+    resp = make_response(redirect(url_for('index')))
+
+    Cookie = generate_cookie(resp)
+    Cookie.delete_cookie()
+    session.clear()
+
+    return resp
 
 
 @app.route('/delete_account', methods=['POST', 'GET'])
 def delete_account():
-
-    user_info = User.query.filter_by(Userid=user).first()
-
     if request.method == 'POST':
         password = request.form['password']
         try:
+            Access_cookie = request.cookies.get("Access_Token")
+            Userid = decode_token(Access_cookie)
+            user_info = User.query.filter_by(Userid=Userid).first()
             if user_info.check_password(password):
                 post = Post.query.filter_by(writer=user_info.Userid).all()
                 comment = Comment.query.filter_by(nickname=user_info.Userid).all()
@@ -81,6 +91,7 @@ def delete_account():
                     user.nickname = '(알수없음)'
 
                 db.session.delete(user_info)
+                session.clear()
                 return redirect(url_for('index')), 301
             else:
                 raise AuthenticateFailed()

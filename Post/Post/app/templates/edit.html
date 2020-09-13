@@ -3,16 +3,29 @@
 {% if title %}
     <h3> 수정하기 </h3>
 {% endif %}
-<form action="" method="post">
+
+<div>
+    <p>
+        제목 :
+        <a> {{ note.title }} </a>
+    </p><hr>
+    <p>
+        내용
+    </p>
+    <a> {{ note.content }} </a>
+    <br><b>↓</b><hr>
+</div>
+
+<form action="" method="PUT">
     <div>
-        <label for="title">제목</label>
+        <label for="title"> 수정할 제목 </label>
         <div>
             <input type="text" name="title" id="title"></input>
         </div>
     </div>
 
     <div>
-        <label for = "content">내용</label><br>
+        <label for = "content">수정할 내용</label><br>
         <textarea type="text" name="content" id="content"></textarea>
     </div>
     <div>
