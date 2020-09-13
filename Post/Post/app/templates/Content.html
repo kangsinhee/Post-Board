@@ -2,16 +2,22 @@
 {% block content %}
 <div>
     <div>
-        <b> {{ post.title }} </b>
-        <a href="{{ url_for('edit', uuid=post.uuid) }}" style="text-decoration: none"> [ 수정하기 ] </a>
-        <a href="{{ url_for('index') }}" style="text-decoration: none"> [ 목록으로 ] </a><hr>
+        <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
+            <li> {{ post.title }} </li>
+            <li>
+                <a href="{{ url_for('edit', uuid=post.uuid) }}" style="text-decoration: none"> [ 수정 ] </a>
+                <a href="{{ url_for('delete', uuid=post.uuid) }}"> [ 삭제 ] </a>
+                <a href="{{ url_for('index') }}" style="text-decoration: none"> [ 목록 ] </a>
+            </li>
+        </ul><hr>
         <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
             <li style="font-size: 13px;"><a> {{ post.created_at }} </a></li>
             <li style="font-size: 13px;"><a> {{ post.writer }} </a> </li>
         </ul><hr>
 
-
-        <p style="font-size: 15px"> {{ post.content }} </p>
+        <p style="font-size: 15px">
+            <pre>{{ post.content }}</pre>
+        </p>
         <br>
 
         <hr>

@@ -1,5 +1,3 @@
-from flask import redirect, url_for
-
 from Post.config.app_config import DevLevelAppconfig
 from Post.app.util.Token_generator import generate_access_token, generate_refresh_token, decode_token
 

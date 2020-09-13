@@ -10,8 +10,6 @@
             <th style="width: 300px">제목</th>
             <th>닉네임</th>
             <th>날짜</th>
-            <th>수정</th>
-            <th>삭제</th>
         </tr>
         </thead>
         <tbody>
@@ -21,8 +19,6 @@
             <td><a href="{{ url_for('viewpost', uuid=i.uuid) }}">{{ i.title }}</a></td>
             <td>{{ i.writer }} </td>
             <td>{{ i.created_at }}</td>
-            <td><a href="{{ url_for('edit', uuid=i.uuid) }}"> 수정 </a></td>
-            <td><a href="{{ url_for('delete', uuid=i.uuid) }}"> 삭제 </a></td>
         </tr>
         {% endfor %}
         </tbody>

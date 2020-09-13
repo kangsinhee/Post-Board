@@ -35,7 +35,7 @@ def add():
     else:
         return redirect(url_for('login'))
 
-@app.route('/post/<int:uuid>/edit', methods=['GET', 'PUT'])
+@app.route('/post/<int:uuid>/edit', methods=['POST', 'GET'])
 @Auth_Validate
 def edit(uuid):
     user = session.get('User', None)
@@ -43,7 +43,7 @@ def edit(uuid):
     if user != post.writer:
         return redirect(url_for('login'))
     else:
-        if request.method == 'PUT':
+        if request.method == 'POST':
             now = datetime.datetime.now()
             post.title, post.content = request.form['title'], request.form['content']
             post.created_at = now

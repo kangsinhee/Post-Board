@@ -75,16 +75,15 @@ def logout():
 
 @app.route('/delete_account', methods=['POST', 'GET'])
 def delete_account():
+    Access_cookie = request.cookies.get("Access_Token")
+    Userid = decode_token(Access_cookie)
+    user_info = User.query.filter_by(Userid=Userid).first()
     if request.method == 'POST':
         password = request.form['password']
         try:
-            Access_cookie = request.cookies.get("Access_Token")
-            Userid = decode_token(Access_cookie)
-            user_info = User.query.filter_by(Userid=Userid).first()
             if user_info.check_password(password):
                 post = Post.query.filter_by(writer=user_info.Userid).all()
                 comment = Comment.query.filter_by(nickname=user_info.Userid).all()
-                # 닉네임으로 수정 필요
                 for user in post:
                     user.writer = '(알수없음)'
                 for user in comment:
@@ -97,4 +96,4 @@ def delete_account():
                 raise AuthenticateFailed()
         except:
             raise AuthenticateFailed()
-    return render_template('exit.html', user = user_info.Userid)
+    return render_template('exit.html', user=user_info.Userid)
