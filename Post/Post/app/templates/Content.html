@@ -56,14 +56,27 @@
             <li>
                 <acticle>
                     <b style="padding-right: 20px"> {{ item.nickname }} </b>
-                <a> {{ item.create_time }} </a>
-                <p>
-                    {{ item.content }}<br>
-                    <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 수정 ] </a>
-                    <a href="{{ url_for('delete_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 삭제 ]</a>
-                <hr></p>
-            </acticle>
-        </li>
+                    <a> {{ item.create_time }} </a>
+                    <p>
+                        {{ item.content }}<br>
+                        <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 수정 ] </a>
+                        <a href="{{ url_for('delete_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 삭제 ]</a><hr>
+                    </p>
+                </acticle>
+                {% for c_item in c_comment %}
+                <acticle>
+                    {% if c_comment.comment_id == item.uuid %}
+                    <b style="padding-right: 20px"> {{ c_item.nickname }} </b>
+                    <a> {{ c_item.create_time }} </a>
+                    <p>
+                        {{ c_item.content }}<br>
+                        <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 수정 ] </a>
+                        <a href="{{ url_for('delete_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 삭제 ]</a><hr>
+                    </p>
+                    {% endif %}
+                </acticle>
+                {% endfor %}
+            </li>
         {% endfor %}
     </div>
 </div>

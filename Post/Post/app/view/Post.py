@@ -70,6 +70,7 @@ def viewpost(uuid):
     user = session.get('User', None)
     post = Post.query.get(uuid)
     comment = Comment.query.filter_by(post_id = uuid).order_by(Comment.uuid.desc()).all()
+    c_comment = C_comment.query.filter_by(post_id = uuid).order_by(C_comment.uuid.desc()).all()
 
     Previous = Post.query.filter(Post.uuid < post.uuid).order_by(Post.uuid.desc()).first()
     Next = Post.query.filter(Post.uuid > post.uuid).order_by(Post.uuid.asc()).first()
@@ -85,9 +86,11 @@ def viewpost(uuid):
                     "msg": "Please fill all blanks"
                 }), 401
             return redirect(url_for('viewpost', uuid=uuid))
-    return render_template('Content.html', user=user, post=post, comment = comment, Previous=Previous, Next=Next)
+    return render_template('Content.html',
+                           user=user, post=post, comment = comment,
+                           c_comment = c_comment, Previous=Previous, Next=Next)
 
-@app.route('/post/<int:uuid>/<int:c_uuid>', methods=['POST', 'GET'])
+@app.route('/post/<int:uuid>/edit/<int:c_uuid>', methods=['POST', 'GET'])
 @Auth_Validate
 def edit_comment(uuid, c_uuid):
     user = session.get('User', None)
@@ -110,3 +113,21 @@ def delete_comment(uuid, c_uuid):
     else:
         db.session.delete(comment)
         return redirect(url_for('viewpost', uuid = uuid))
+
+@app.route('/post/<int:uuid>/<int:c_uuid>', methods=['POST', 'GET'])
+@Auth_Validate
+def c_comment(uuid, c_uuid):
+    user = session.get('User', None)
+    if user != None:
+        if request.method == 'POST':
+            now = datetime.datetime.now()
+            content = request.form['content']
+            if content != '':
+                comment = C_comment(uuid, c_uuid, user, content, now)
+                db.session.add(comment)
+            else:
+                return jsonify({
+                    "msg": "Please fill all blanks"
+                }), 401
+            return redirect(url_for('viewpost', uuid=uuid))
+    return render_template('Edit_comment.html', user=user)
