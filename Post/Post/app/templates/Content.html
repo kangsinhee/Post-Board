@@ -3,11 +3,13 @@
 <div>
     <div>
         <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
-            <li> {{ post.title }} </li>
+            <li><b> {{ post.title }} </b></li>
             <li>
-                <a href="{{ url_for('edit', uuid=post.uuid) }}" style="text-decoration: none"> [ 수정 ] </a>
-                <a href="{{ url_for('delete', uuid=post.uuid) }}"> [ 삭제 ] </a>
-                <a href="{{ url_for('index') }}" style="text-decoration: none"> [ 목록 ] </a>
+                {% if post.writer == user %}
+                <a href="{{ url_for('edit', uuid=post.uuid) }}" style="text-decoration: none; color: #6511f0"> [ 수정 ] </a>
+                <a href="{{ url_for('delete', uuid=post.uuid) }}" style="text-decoration: none; color: #6511f0"> [ 삭제 ]  </a>
+                {% endif %}
+                <a href="{{ url_for('index') }}" style="text-decoration: none; color: #6511f0; margin-left: 5px"> [ 목록으로 ] </a>
             </li>
         </ul><hr>
         <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
@@ -15,27 +17,25 @@
             <li style="font-size: 13px;"><a> {{ post.writer }} </a> </li>
         </ul><hr>
 
-        <p style="font-size: 15px">
-            <pre>{{ post.content }}</pre>
+        <p>
+            <pre style="line-height: 25px; font-size: 15px; white-space: pre-wrap">{{ post.content }}</pre>
         </p>
-        <br>
 
-        <hr>
-        <a> 이전글 : </a>
-        {% if Next != None %}
-            <a href="{{ url_for('viewpost', uuid=Next.uuid) }}" style="text-decoration: none"> {{ Next.title }} </a>
-        {% else %}
-            <b> 이전 게시물이 없습니다. </b>
-        {% endif %}
+        <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
+            <li>
+                {% if Next != None %}
+                <b> ← </b>
+                <a href="{{ url_for('viewpost', uuid=Next.uuid) }}" style="text-decoration: none; color: #6511f0"> {{ Next.title }} </a>
+                {% endif %}
+            </li>
+            <li>
+                {% if Previous != None %}
+                <a href="{{ url_for('viewpost', uuid=Previous.uuid) }}" style="text-decoration: none; color: #6511f0"> {{ Previous.title }} </a>
+                <b> → </b>
+                {% endif %}
+            </li>
+        </ul>
 
-        <hr>
-        <a> 다음글 : </a>
-        {% if Previous != None %}
-            <a href="{{ url_for('viewpost', uuid=Previous.uuid) }}" style="text-decoration: none"> {{ Previous.title }} </a>
-        {% else %}
-            <b> 다음 게시물이 없습니다. </b>
-        {% endif %}
-        <hr>
     </div>
     <div>
         <form action="" method="POST">
@@ -53,32 +53,46 @@
     </div>
     <div>
         {% for item in comment %}
-            <li>
+            <acticle>
+                <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
+                    <li><b> {{ item.nickname }} </b></li>
+                    <li><a> {{ item.create_time }} </a></li>
+                </ul>
+                {{ item.content }}<br>
+                <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
+                    <li>
+                        <a href="{{ url_for('c_comment', uuid = post.uuid, c_uuid=item.uuid) }}" style="text-decoration: none; color: #6511f0"> 답글달기 </a>
+                    </li>
+                    {% if item.nickname == user %}
+                    <li>
+                        <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}" style="text-decoration: none; color: #6511f0"> [ 수정 ] </a>
+                        <a href="{{ url_for('delete_comment', uuid = post.uuid, c_uuid=item.uuid) }}" style="text-decoration: none; color: #6511f0"> [ 삭제 ]</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </acticle>
+            {% for c_item in c_comment %}
+            <div style="padding-left: 40px">
                 <acticle>
-                    <b style="padding-right: 20px"> {{ item.nickname }} </b>
-                    <a> {{ item.create_time }} </a>
+                    {% if c_item.comment_id == item.uuid %}
+                    <hr>
+                    <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
+                        <li><b> {{ c_item.nickname }} </b></li>
+                        <li><a> {{ c_item.create_time }} </a></li>
+                    </ul>
+                    {{ c_item.content }}<br>
                     <p>
-                        {{ item.content }}<br>
-                        <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 수정 ] </a>
-                        <a href="{{ url_for('delete_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 삭제 ]</a><hr>
-                    </p>
-                </acticle>
-                {% for c_item in c_comment %}
-                <acticle>
-                    {% if c_comment.comment_id == item.uuid %}
-                    <b style="padding-right: 20px"> {{ c_item.nickname }} </b>
-                    <a> {{ c_item.create_time }} </a>
-                    <p>
-                        {{ c_item.content }}<br>
-                        <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 수정 ] </a>
-                        <a href="{{ url_for('delete_comment', uuid = post.uuid, c_uuid=item.uuid) }}"> [ 삭제 ]</a><hr>
+                        {% if c_item.nickname == user %}
+                        <a href="{{ url_for('edit_c_comment', uuid = post.uuid, c_uuid=c_item.uuid) }}" style="text-decoration: none; color: #6511f0"> [ 수정 ] </a>
+                        <a href="{{ url_for('delete_c_comment', uuid = post.uuid, c_uuid=c_item.uuid) }}" style="text-decoration: none; color: #6511f0"> [ 삭제 ]</a>
+                        {% endif %}
                     </p>
                     {% endif %}
                 </acticle>
-                {% endfor %}
-            </li>
+            </div>
+            {% endfor %}
+        <hr>
         {% endfor %}
     </div>
 </div>
-
 {% endblock %}

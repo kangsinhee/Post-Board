@@ -23,12 +23,12 @@ def login():
                     session['User'] = user_info.nickname
                     Cookie.access_cookie(user_info.Userid)
                     Cookie.refresh_cookie(user_info.Userid)
+                    return resp
                 else:
                     raise AuthenticateFailed()
             except:
                 raise AuthenticateFailed()
-            finally:
-                return resp
+
     return render_template('login.html')
 
 
