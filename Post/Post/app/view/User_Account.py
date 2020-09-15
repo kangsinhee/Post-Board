@@ -7,6 +7,7 @@ from Post.app.models import Post, User, Comment, C_comment
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
 from Post.app.util.Cookie_generator import generate_cookie
+from Post.app.util.Auth_Validate import Auth_Validate, decode_cookie_in_token
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -17,12 +18,11 @@ def login():
                 user_info = User.query.get(Userid)
                 if user_info.check_password(Passwd):
                     session.clear()
+                    session['User'] = user_info.nickname
+
                     resp = make_response(redirect(url_for('index')))
                     Cookie = generate_cookie(resp)
-
-                    session['User'] = user_info.nickname
-                    Cookie.access_cookie(user_info.Userid, user_info.nickname)
-                    Cookie.refresh_cookie(user_info.Userid, user_info.nickname)
+                    Cookie.generate_all_cookies(user_info.Userid, user_info.nickname)
                     return resp
                 else:
                     raise AuthenticateFailed()
@@ -58,8 +58,7 @@ def logout():
 
 @app.route('/delete_account', methods=['POST', 'GET'])
 def delete_account():
-    Access_cookie = request.cookies.get("Access_Token")
-    Userid = decode_token(Access_cookie)
+    Userid = decode_cookie_in_token("Access_Token", "Userid")
     user_info = User.query.filter_by(Userid=Userid).first()
     if request.method == 'POST':
         password = request.form['password']
