@@ -4,25 +4,30 @@ import time
 from Post.config.app_config import DevLevelAppconfig
 from Post.app.exception import AuthenticateFailed
 
-def generate_token(Userid, token_type, expire_time):
+def generate_token(token_type, Userid, nickname, expire_time):
     payload = {
         "iat" : int(time.time()),
-        "sub" : Userid,
+        "exp" : int(time.time() + expire_time),
+        "Userid" : Userid,
+        "nickname" : nickname,
         "type" : token_type
     }
     return jwt.encode(payload, DevLevelAppconfig.SECRET_KEY, algorithm="HS256")
 
-def generate_access_token(Userid):
+def generate_access_token(Userid, nickname):
     token = generate_token(
-        Userid, "access_token", DevLevelAppconfig.ACCESS_TOKEN_EXPIRE_TIME
+        "access_token", Userid, nickname, DevLevelAppconfig.ACCESS_TOKEN_EXPIRE_TIME
     )
     return token.decode()
 
-def generate_refresh_token(Userid):
+def generate_refresh_token(Userid, nickname):
     token = generate_token(
-        Userid, "refresh_token", DevLevelAppconfig.REFRESH_TOKEN_EXPIRE_TIME
+        "refresh_token", Userid, nickname, DevLevelAppconfig.REFRESH_TOKEN_EXPIRE_TIME
     )
     return token.decode()
 
 def decode_token(token):
-    return jwt.decode(token, DevLevelAppconfig.SECRET_KEY, verify=False)["sub"]
+    return jwt.decode(token, DevLevelAppconfig.SECRET_KEY, verify=False)["Userid"]
+
+def decode_token(token, name):
+    return jwt.decode(token, DevLevelAppconfig.SECRET_KEY, verify=False)[name]

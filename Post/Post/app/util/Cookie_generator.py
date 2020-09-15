@@ -5,12 +5,12 @@ class generate_cookie():
     def __init__(self, resp):
         self.resp = resp
 
-    def access_cookie(self, User):
-        self.resp.set_cookie("Access_Token", generate_access_token(User),
+    def access_cookie(self, Userid, nickname):
+        self.resp.set_cookie("Access_Token", generate_access_token(Userid, nickname),
                         max_age=DevLevelAppconfig.ACCESS_TOKEN_EXPIRE_TIME)
 
-    def refresh_cookie(self, User):
-        self.resp.set_cookie("Refresh_Token", generate_refresh_token(User),
+    def refresh_cookie(self, Userid, nickname):
+        self.resp.set_cookie("Refresh_Token", generate_refresh_token(Userid, nickname),
                         max_age=DevLevelAppconfig.REFRESH_TOKEN_EXPIRE_TIME)
 
     def delete_cookie(self):

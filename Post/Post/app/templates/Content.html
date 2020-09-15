@@ -60,9 +60,11 @@
                 </ul>
                 {{ item.content }}<br>
                 <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
+                    {% if user %}
                     <li>
                         <a href="{{ url_for('c_comment', uuid = post.uuid, c_uuid=item.uuid) }}" style="text-decoration: none; color: #6511f0"> 답글달기 </a>
                     </li>
+                    {% endif %}
                     {% if item.nickname == user %}
                     <li>
                         <a href="{{ url_for('edit_comment', uuid = post.uuid, c_uuid=item.uuid) }}" style="text-decoration: none; color: #6511f0"> [ 수정 ] </a>

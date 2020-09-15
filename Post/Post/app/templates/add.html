@@ -1,20 +1,18 @@
 {% extends 'layout.html' %}
 {% block content %}
 <h3> 작성하기 </h3>
-<form action="" method="post">
+<form action="http://127.0.0.1:5005/add" method="POST" enctype="multipart/form-data">
     <div>
-        <label for="title">제목</label>
-        <div>
-            <textarea cols="50" rows="1" type="text" name="title" id="title"></textarea>
-        </div>
-    </div>
-
-    <div>
+        <label for="title">제목</label><br>
+        <textarea cols="50" rows="1" type="text" name="title" id="title"></textarea>
+        <br>
         <label for="content">내용</label><br>
         <textarea cols="50" rows="8" type="text" name="content" id="content"></textarea>
+        <br>
+        <input type="file" name="file"/>
     </div>
     <div>
-        <button type="submit">등록</button>
+        <input type="submit" value="등록"/>
     </div>
 </form>
 {% endblock %}

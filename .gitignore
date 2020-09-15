@@ -57,6 +57,8 @@ ENV/
 env.bak/
 venv.bak/
 
+upload/
+
 # mypy
 .mypy_cache/
 
@@ -73,15 +75,8 @@ venv.bak/
 # CMake
 cmake-build-*/
 
-# IntelliJ
-out/
-
 # mpeltonen/sbt-idea plugin
 .idea_modules/
-
-# Sonarlint plugin
-# https://plugins.jetbrains.com/plugin/7973-sonarlint
-.idea/**/sonarlint/
 
 # Markdown Navigator plugin
 .idea/**/markdown-navigator/

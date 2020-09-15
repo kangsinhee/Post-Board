@@ -1,8 +1,8 @@
 from flask import (
     render_template, request, redirect, make_response,
-    url_for, jsonify, blueprints, session
+    url_for, jsonify, session
 )
-from Post.app.extension import app, db, jwt
+from Post.app.extension import app, db
 from Post.app.models import Post, User, Comment, C_comment
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
@@ -21,8 +21,8 @@ def login():
                     Cookie = generate_cookie(resp)
 
                     session['User'] = user_info.nickname
-                    Cookie.access_cookie(user_info.Userid)
-                    Cookie.refresh_cookie(user_info.Userid)
+                    Cookie.access_cookie(user_info.Userid, user_info.nickname)
+                    Cookie.refresh_cookie(user_info.Userid, user_info.nickname)
                     return resp
                 else:
                     raise AuthenticateFailed()
@@ -65,15 +65,15 @@ def delete_account():
         password = request.form['password']
         try:
             if user_info.check_password(password):
-                post = Post.query.filter_by(writer=user_info.Userid).all()
+                post = Post.query.filter_by(writer=user_info.nickname).all()
                 comment = Comment.query.filter_by(nickname=user_info.nickname).all()
                 c_comment = C_comment.query.filter_by(nickname=user_info.nickname).all()
-                for user in post:
-                    user.writer = '(알수없음)'
                 for user in comment:
                     user.nickname = '(알수없음)'
                 for user in c_comment:
                     user.nickname = '(알수없음)'
+                for user in post:
+                    user.writer = '(알수없음)'
                 db.session.delete(user_info)
                 session.clear()
                 return redirect(url_for('index')), 301
