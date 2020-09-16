@@ -13,11 +13,20 @@ def default_generate_token(token_type, Userid, nickname, expire_time):
     }
     return jwt.encode(payload, DevLevelAppconfig.SECRET_KEY, algorithm="HS256")
 
-def generate_token(type, Userid, nickname):
+def generate_access_token(Userid, nickname):
     token = default_generate_token(
-        type, Userid, nickname, DevLevelAppconfig.ACCESS_TOKEN_EXPIRE_TIME
+        "access_token", Userid, nickname, DevLevelAppconfig.ACCESS_TOKEN_EXPIRE_TIME
     )
     return token.decode()
 
-def decode_token(type, payload):
-    return jwt.decode(type, DevLevelAppconfig.SECRET_KEY, verify=False)[payload]
+def generate_refresh_token(Userid, nickname):
+    token = default_generate_token(
+        "refresh_token", Userid, nickname, DevLevelAppconfig.REFRESH_TOKEN_EXPIRE_TIME
+    )
+    return token.decode()
+
+def decode_token(token):
+    return jwt.decode(token, DevLevelAppconfig.SECRET_KEY, verify=False)["Userid"]
+
+def decode_token(token, payload):
+    return jwt.decode(token, DevLevelAppconfig.SECRET_KEY, verify=False)[payload]

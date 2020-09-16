@@ -7,7 +7,7 @@ from Post.app.models import Post, User, Comment, C_comment
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
 from Post.app.util.Cookie_generator import generate_cookie
-from Post.app.util.Auth_Validate import Auth_Validate, decode_cookie_in_token
+from Post.app.util.Auth_Validate import Auth_Validate, decode_token_in_cookie
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():

@@ -1,4 +1,4 @@
-from flask import request, make_response
+from flask import request, make_response, session, redirect, url_for
 from Post.app.exception import AuthenticateFailed
 
 from Post.app.util.Token_generator import decode_token
@@ -9,29 +9,28 @@ def Auth_Validate(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
-            decode_cookie_in_token("Access_Token", "Userid")
+            Access_token = decode_token_in_cookie("Access_Token")
         except:
             resp = Extend_Access_token()
             return resp
         return f(*args, **kwargs)
     return wrapper
 
-def decode_cookie_in_token(type, payload):
-    try:
-        cookie = request.cookies.get(type)
-        token = decode_token(cookie, payload)
-        return token
-    except:
-        raise AuthenticateFailed()
+def decode_token_in_cookie(token):
+    cookie = request.cookies.get(token)
+    token = decode_token(cookie)
+    return token
 
 def Extend_Access_token():
     try:
-        Refresh_Token = decode_cookie_in_token("Refresh_Token", "Userid")
+        Refresh_Token = decode_token_in_cookie("Refresh_Token")
         if Refresh_Token != None:
             resp = make_response()
             Cookie = generate_cookie(resp)
-            Cookie.access_cookie(Refresh_Token)
+            Cookie.access_cookie(Userid=Refresh_Token, nickname="nickname")
 
             return resp
+        else:
+            raise AuthenticateFailed()
     except:
-        raise AuthenticateFailed()
+        print("extend error")

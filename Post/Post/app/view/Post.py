@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from Post.app.exception import AuthenticateFailed
 from Post.app.extension import app, db
 from Post.app.models import Post, Comment, C_comment, Files
-from Post.app.util.Auth_Validate import Auth_Validate, decode_cookie_in_token
+from Post.app.util.Auth_Validate import Auth_Validate, decode_token_in_cookie
 
 @app.route('/', methods=['GET'])
 def index():
