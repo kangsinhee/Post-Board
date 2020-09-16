@@ -7,8 +7,8 @@ from flask import (
 from werkzeug.utils import secure_filename
 from Post.app.exception import AuthenticateFailed
 from Post.app.extension import app, db
-from Post.app.models import Post, Comment, C_comment, Files
-from Post.app.util.Auth_Validate import Auth_Validate, decode_token_in_cookie
+from Post.app.models import User, Post, Comment, C_comment, Files
+from Post.app.util.Auth_Validate import Auth_Validate
 
 @app.route('/', methods=['GET'])
 def index():
@@ -49,8 +49,9 @@ def viewpost(uuid):
 @app.route('/add', methods=['POST', 'GET'])
 @Auth_Validate
 def add():
-    Userid = decode_cookie_in_token("Access_Token", "Userid")
-    nickname = decode_cookie_in_token("Access_token", "nickname")
+    user = session.get('User', None)
+    Userinfo = User.query.filter_by(nickname = user).first()
+
     if request.method == 'POST':
         now = datetime.datetime.now()
         title = request.form['title']
@@ -61,8 +62,8 @@ def add():
             UPLOAD_FOLDER_LOCATION = os.getenv("UPLOAD_FOLDER_LOCATION")
             file.save(UPLOAD_FOLDER_LOCATION + secure_filename(file.filename))
 
-            post = Post(title, content, now, nickname)
-            files = Files(Userid, UPLOAD_FOLDER_LOCATION + secure_filename(file.filename))
+            post = Post(title, content, now, Userinfo.nickname)
+            files = Files(Userinfo.Userid, UPLOAD_FOLDER_LOCATION + secure_filename(file.filename))
             db.session.add(post)
             db.session.add(files)
         else:
@@ -70,7 +71,7 @@ def add():
                 "msg": "Please fill all blanks"
             }), 401
         return redirect(url_for('index'))
-    return render_template('add.html', user=nickname)
+    return render_template('add.html', user=user)
 
 
 @app.route('/post/<int:uuid>/edit', methods=['POST', 'GET'])

@@ -7,7 +7,7 @@ from Post.app.models import Post, User, Comment, C_comment
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
 from Post.app.util.Cookie_generator import generate_cookie
-from Post.app.util.Auth_Validate import Auth_Validate, decode_token_in_cookie
+from Post.app.util.Auth_Validate import Auth_Validate
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -18,11 +18,12 @@ def login():
                 user_info = User.query.get(Userid)
                 if user_info.check_password(Passwd):
                     session.clear()
-                    session['User'] = user_info.nickname
-
                     resp = make_response(redirect(url_for('index')))
                     Cookie = generate_cookie(resp)
-                    Cookie.generate_all_cookies(user_info.Userid, user_info.nickname)
+
+                    session['User'] = user_info.nickname
+                    Cookie.access_cookie(user_info.Userid, user_info.nickname)
+                    Cookie.refresh_cookie(user_info.Userid, user_info.nickname)
                     return resp
                 else:
                     raise AuthenticateFailed()
@@ -30,7 +31,6 @@ def login():
                 raise AuthenticateFailed()
 
     return render_template('login.html')
-
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
