@@ -46,7 +46,6 @@ def register():
 @app.route('/logout', methods=['GET'])
 def logout():
     resp = make_response(redirect(url_for('index')))
-
     Cookie = generate_cookie(resp)
     Cookie.delete_cookie()
 

@@ -16,22 +16,17 @@ def Auth_Validate(func):
     return wrapper
 
 def Load_Token(Token_name):
-    try:
-        cookie = request.cookies.get(Token_name)
-        Token = decode_token(cookie)
-    except:
-        Token = None
+    cookie = request.cookies.get(Token_name)
+    Token = decode_token(cookie)
     return Token
 
 def Extend_access_Token():
     try:
         Token = Load_Token(Token_name="Refresh_Token")
-        if Token is not None:
+        if Token != None:
             resp = make_response(redirect(request.url))
             Cookie = generate_cookie(resp)
             Cookie.access_cookie(Token["userid"], Token["nickname"])
             return resp
-        else:
-            raise AuthenticateFailed()
     except:
         raise AuthenticateFailed()

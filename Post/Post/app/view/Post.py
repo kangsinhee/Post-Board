@@ -27,9 +27,10 @@ def index():
 def viewpost(uuid):
     try:
         Token = Load_Token('Access_Token')
-        nickname = Token['nickname']
+        user = Token['nickname']
     except:
-        nickname = None
+        user = None
+
     post = Post.query.get(uuid)
     comment = Comment.query.filter_by(post_id = uuid).order_by(Comment.uuid.desc()).all()
     c_comment = C_comment.query.filter_by(post_id = uuid).order_by(C_comment.uuid.asc()).all()
@@ -37,11 +38,11 @@ def viewpost(uuid):
     Previous = Post.query.filter(Post.uuid < post.uuid).order_by(Post.uuid.desc()).first()
     Next = Post.query.filter(Post.uuid > post.uuid).order_by(Post.uuid.asc()).first()
 
-    if request.method == 'POST' and nickname != None:
+    if request.method == 'POST' and Token != None:
         now = datetime.datetime.now()
         content = request.form['content']
         if content != '':
-            comment = Comment(uuid, nickname, content, now)
+            comment = Comment(uuid, Token['nickname'], content, now)
             db.session.add(comment)
         else:
             return jsonify({
@@ -49,8 +50,8 @@ def viewpost(uuid):
             }), 401
         return redirect(url_for('viewpost', uuid=uuid))
     return render_template('Content.html',
-                            user=nickname, post=post, comment = comment,
-                            c_comment=c_comment, Previous=Previous, Next=Next)
+                        user=user, post=post, comment = comment,
+                        c_comment=c_comment, Previous=Previous, Next=Next)
 
 
 @app.route('/add', methods=['POST', 'GET'])
@@ -58,10 +59,10 @@ def viewpost(uuid):
 def add():
     try:
         Token = Load_Token('Access_Token')
-        nickname = Token['nickname']
+        user = Token['nickname']
     except:
-        nickname = None
-    if request.method == 'POST' and nickname != None:
+        user = None
+    if request.method == 'POST' and Token != None:
         now = datetime.datetime.now()
         title = request.form['title']
         content = request.form['content']
@@ -71,7 +72,7 @@ def add():
             UPLOAD_FOLDER_LOCATION = os.getenv("UPLOAD_FOLDER_LOCATION")
             file.save(UPLOAD_FOLDER_LOCATION + secure_filename(file.filename))
 
-            post = Post(title, content, now, nickname)
+            post = Post(title, content, now, Token['nickname'])
             files = Files(Token['userid'], UPLOAD_FOLDER_LOCATION + secure_filename(file.filename))
             db.session.add(post)
             db.session.add(files)
@@ -80,7 +81,7 @@ def add():
                 "msg": "Please fill all blanks"
             }), 401
         return redirect(url_for('index'))
-    return render_template('add.html', user=nickname)
+    return render_template('add.html', user=Token['nickname'])
 
 
 @app.route('/post/<int:uuid>/edit', methods=['POST', 'GET'])
@@ -99,22 +100,25 @@ def edit(uuid):
                 return redirect(url_for('viewpost', uuid = uuid))
         return render_template('edit.html', user=Token['nickname'], note=post)
     else:
-        raise
+        raise AuthenticateFailed()
 
 
 @app.route('/post/<int:uuid>/delete', methods=['GET'])
 @Auth_Validate
 def delete(uuid):
-    user = session.get('User', None)
-    post = Post.query.get(uuid)
-    comment = Comment.query.filter_by(post_id=uuid).all()
-    c_comment = C_comment.query.filter_by(post_id=uuid).all()
-    if user != post.writer:
-        return redirect(url_for('login'))
+    Token = Load_Token('Access_Token')
+    if Token != None:
+        post = Post.query.get(uuid)
+        comment = Comment.query.filter_by(post_id=uuid).all()
+        c_comment = C_comment.query.filter_by(post_id=uuid).all()
+        if Token['nickname'] != post.writer:
+            return redirect(url_for('login'))
+        else:
+            db.session.delete(post)
+            for item in comment:
+                db.session.delete(item)
+            for item in c_comment:
+                db.session.delete(item)
+            return redirect(url_for('index'))
     else:
-        db.session.delete(post)
-        for item in comment:
-            db.session.delete(item)
-        for item in c_comment:
-            db.session.delete(item)
-        return redirect(url_for('index'))
+        raise AuthenticateFailed()
