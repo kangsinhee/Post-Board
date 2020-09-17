@@ -7,7 +7,8 @@ def default_generate_token(token_type, Userid, nickname, expire_time):
     payload = {
         "iat" : int(time.time()),
         "exp" : int(time.time()) + int(expire_time.seconds),
-        "sub" : Userid,
+        "sub" : token_type,
+        "userid" : Userid,
         "nickname" : nickname,
         "type" : token_type
     }

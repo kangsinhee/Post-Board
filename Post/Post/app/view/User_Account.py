@@ -1,13 +1,13 @@
 from flask import (
     render_template, request, redirect, make_response,
-    url_for, jsonify, session
+    url_for, jsonify
 )
 from Post.app.extension import app, db
 from Post.app.models import Post, User, Comment, C_comment
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
 from Post.app.util.Cookie_generator import generate_cookie
-from Post.app.util.Auth_Validate import Auth_Validate
+from Post.app.util.Auth_Validate import Auth_Validate, Load_Token
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -17,11 +17,9 @@ def login():
             try:
                 user_info = User.query.get(Userid)
                 if user_info.check_password(Passwd):
-                    session.clear()
                     resp = make_response(redirect(url_for('index')))
                     Cookie = generate_cookie(resp)
 
-                    session['User'] = user_info.nickname
                     Cookie.access_cookie(user_info.Userid, user_info.nickname)
                     Cookie.refresh_cookie(user_info.Userid, user_info.nickname)
                     return resp
@@ -51,15 +49,14 @@ def logout():
 
     Cookie = generate_cookie(resp)
     Cookie.delete_cookie()
-    session.clear()
 
     return resp
 
 
 @app.route('/delete_account', methods=['POST', 'GET'])
 def delete_account():
-    Userid = decode_cookie_in_token("Access_Token", "Userid")
-    user_info = User.query.filter_by(Userid=Userid).first()
+    Token = Load_Token("Access_Token")
+    user_info = User.query.filter_by(Userid=Token["userid"]).first()
     if request.method == 'POST':
         password = request.form['password']
         try:
@@ -74,7 +71,6 @@ def delete_account():
                 for user in post:
                     user.writer = '(알수없음)'
                 db.session.delete(user_info)
-                session.clear()
                 return redirect(url_for('index')), 301
             else:
                 raise AuthenticateFailed()

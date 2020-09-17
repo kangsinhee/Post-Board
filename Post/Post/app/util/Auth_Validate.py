@@ -1,36 +1,35 @@
 from functools import wraps
-from flask import request, make_response, redirect, url_for, session
+from flask import request, make_response, redirect, url_for
 
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
 from Post.app.util.Cookie_generator import generate_cookie
-from Post.app.models import User
 
-def Auth_Validate(f):
-    @wraps(f)
+def Auth_Validate(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            Access_Token = Check_Token(Token_name="Access_Token")
+            Load_Token(Token_name="Access_Token")
         except:
-            Extend_Token = Extend_access_Token()
-
-            return Extend_Token
-        return f(*args, **kwargs)
+            return Extend_access_Token()
+        return func(*args, **kwargs)
     return wrapper
 
-def Check_Token(Token_name):
-    cookie = request.cookies.get(Token_name)
-    Token = decode_token(cookie)
+def Load_Token(Token_name):
+    try:
+        cookie = request.cookies.get(Token_name)
+        Token = decode_token(cookie)
+    except:
+        Token = None
     return Token
 
 def Extend_access_Token():
     try:
-        Token = Check_Token(Token_name="Refresh_Token")
+        Token = Load_Token(Token_name="Refresh_Token")
         if Token is not None:
-            resp = make_response(redirect())
+            resp = make_response(redirect(request.url))
             Cookie = generate_cookie(resp)
-            Cookie.access_cookie(Token["sub"], Token["nickname"])
-
+            Cookie.access_cookie(Token["userid"], Token["nickname"])
             return resp
         else:
             raise AuthenticateFailed()
