@@ -42,7 +42,8 @@
             <div>
                 {% if user != None %}
                     <b> [ {{ user }} ] </b>
-                    <label for = "content">댓글남기기</label><br>
+                    <label for = "content">댓글남기기</label>
+                    <a>( {{ count }} )</a><br>
                     <textarea type="text" name="content" id="content", style="height: 60px; width: 500px"></textarea><br>
                     <button type="submit">추가</button>
                 {% else %}

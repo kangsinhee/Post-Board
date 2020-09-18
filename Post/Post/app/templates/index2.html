@@ -1,0 +1,68 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div>
+    <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
+        <li><a> 총 {{ post.total }}개</a></li>
+        <li><a href="{{ url_for('add') }}" style="text-decoration: none; color: #6511f0"> 게시물 작성 </a></li>
+    </ul>
+
+    {% for i in post.items %}
+    <div style="cursor: pointer" onclick="location.href='{{ url_for("viewpost", uuid=i.uuid) }}'">
+        <acticle>
+            <p>
+                <h3>{{i.title}}</h3>
+                <ul style="display: flex; list-style: none; justify-content: space-between; padding-left:0px">
+                    <li><a style="color: #666666; "> {{ i.created_at }} </a></li>
+                    <li><a style="color: #666666; "> {{ count }} </a></li>
+                </ul>
+            </p>
+            by <b> {{ i.writer }} </b>
+            <hr>
+        </acticle>
+    </div>
+    {% endfor %}
+    <div>
+        <ul style="display: flex; padding-left: 0px; list-style: none">
+            {% if post.has_prev %}
+            <li style="display: flex">
+                <a href="?page={{ post.prev_num }}" style="text-decoration: none; color: black">[ 이전 ]</a>
+            </li>
+            {% else %}
+            <li style="display: flex">
+                <a tabindex="-1" aria-disabled="true" href="#" style="text-decoration: none; color: black">[ 이전 ]</a>
+            </li>
+            {% endif %}
+
+            {% for page_num in post.iter_pages() %}
+            {% if page_num %}
+            {% if page_num != post.page %}
+            <li style="display: flex">
+                <a href="?page={{ page_num }}" style="text-decoration: none; color: black"> ( {{ page_num }} ) </a>
+            </li>
+            {% else %}
+            <li aria-current="page" style="display: flex">
+                <a href="#" style="text-decoration: none; color: black"> ( {{ page_num }} ) </a>
+            </li>
+            {% endif %}
+            {% else %}
+            <li style="display: flex">
+                <a class="page-link" href="#">...</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+
+            {% if post.has_next %}
+            <li style=" display: flex">
+                <a href="?page={{ post.next_num }}" style="text-decoration: none; color: black">[ 다음 ]</a>
+            </li>
+            {% else %}
+            <li style="display: flex">
+                <a tabindex="-1" aria-disabled="true" href="#" style="text-decoration: none; color: black">[ 다음 ]</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}
