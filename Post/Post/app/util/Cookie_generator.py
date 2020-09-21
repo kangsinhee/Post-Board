@@ -1,9 +1,10 @@
 from Post.config.app_config import DevLevelAppconfig
 from Post.app.util.Token_generator import generate_access_token, generate_refresh_token, decode_token
 
-class generate_cookie():
+class Manage_cookie():
     def __init__(self, resp):
         self.resp = resp
+
 
     def access_cookie(self, Userid, nickname):
         self.resp.set_cookie("Access_Token", generate_access_token(Userid, nickname),

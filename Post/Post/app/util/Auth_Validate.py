@@ -3,7 +3,7 @@ from flask import request, make_response, redirect, url_for
 
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
-from Post.app.util.Cookie_generator import generate_cookie
+from Post.app.util.Cookie_generator import Manage_cookie
 
 def Auth_Validate(func):
     @wraps(func)
@@ -25,7 +25,7 @@ def Extend_access_Token():
         Token = Load_Token(Token_name="Refresh_Token")
         if Token != None:
             resp = make_response(redirect(request.url))
-            Cookie = generate_cookie(resp)
+            Cookie = Manage_cookie(resp)
             Cookie.access_cookie(Token["userid"], Token["nickname"])
             return resp
     except:

@@ -6,7 +6,7 @@ from Post.app.extension import app, db
 from Post.app.models import Post, User, Comment, C_comment
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
-from Post.app.util.Cookie_generator import generate_cookie
+from Post.app.util.Cookie_generator import Manage_cookie
 from Post.app.util.Auth_Validate import Auth_Validate, Load_Token
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -18,7 +18,7 @@ def login():
                 user_info = User.query.get(Userid)
                 if user_info.check_password(Passwd):
                     resp = make_response(redirect(url_for('index')))
-                    Cookie = generate_cookie(resp)
+                    Cookie = Manage_cookie(resp)
 
                     Cookie.access_cookie(user_info.Userid, user_info.nickname)
                     Cookie.refresh_cookie(user_info.Userid, user_info.nickname)
@@ -46,7 +46,7 @@ def register():
 @app.route('/logout', methods=['GET'])
 def logout():
     resp = make_response(redirect(url_for('index')))
-    Cookie = generate_cookie(resp)
+    Cookie = Manage_cookie(resp)
     Cookie.delete_cookie()
 
     return resp
@@ -70,7 +70,13 @@ def delete_account():
                 for user in post:
                     user.writer = '(알수없음)'
                 db.session.delete(user_info)
-                return redirect(url_for('index')), 301
+
+                resp = make_response(redirect(url_for('index')))
+
+                Cookie = Manage_cookie(resp)
+                Cookie.delete_cookie()
+
+                return resp
             else:
                 raise AuthenticateFailed()
         except:
