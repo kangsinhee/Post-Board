@@ -3,11 +3,11 @@ from flask import (
     render_template, request, redirect,
     url_for, jsonify
 )
-from Post.app.extension import app, db
+from Post.app.extension import db
 from Post.app.models import Comment, C_comment
 from Post.app.util.Auth_Validate import Auth_Validate, Load_Token
 
-@app.route('/post/<int:uuid>/comment/<int:c_uuid>/edit', methods=['POST', 'GET'])
+# @app.route('/post/<int:uuid>/comment/<int:c_uuid>/edit', methods=['POST', 'GET'])
 @Auth_Validate
 def edit_comment(uuid, c_uuid):
     try:
@@ -24,8 +24,8 @@ def edit_comment(uuid, c_uuid):
             return redirect(url_for('viewpost', uuid = uuid))
     return render_template('Edit_comment.html', user=user, comment=comment)
 
-
-@app.route('/post/<int:uuid>/comment/<int:c_uuid>/delete', methods=['GET'])
+#
+# @app.route('/post/<int:uuid>/comment/<int:c_uuid>/delete', methods=['GET'])
 @Auth_Validate
 def delete_comment(uuid, c_uuid):
     try:
@@ -41,7 +41,7 @@ def delete_comment(uuid, c_uuid):
         return redirect(url_for('viewpost', uuid = uuid))
 
 
-@app.route('/post/<int:uuid>/<int:c_uuid>', methods=['POST', 'GET'])
+# @app.route('/post/<int:uuid>/<int:c_uuid>', methods=['POST', 'GET'])
 @Auth_Validate
 def c_comment(uuid, c_uuid):
     try:
@@ -64,7 +64,7 @@ def c_comment(uuid, c_uuid):
     return render_template('Edit_comment.html', user=user, comment=None)
 
 
-@app.route('/post/<int:uuid>/c-comment/<int:c_uuid>/edit', methods=['POST', 'GET'])
+# @app.route('/post/<int:uuid>/c-comment/<int:c_uuid>/edit', methods=['POST', 'GET'])
 @Auth_Validate
 def edit_c_comment(uuid, c_uuid):
     try:
@@ -82,7 +82,7 @@ def edit_c_comment(uuid, c_uuid):
     return render_template('Edit_comment.html', user=user, comment=comment)
 
 
-@app.route('/post/<int:uuid>/c-comment/<int:c_uuid>/delete', methods=['GET'])
+# @app.route('/post/<int:uuid>/c-comment/<int:c_uuid>/delete', methods=['GET'])
 @Auth_Validate
 def delete_c_comment(uuid, c_uuid):
     try:

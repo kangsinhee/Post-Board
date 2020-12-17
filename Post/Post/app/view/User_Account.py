@@ -1,19 +1,19 @@
 from flask import (
     render_template, request, redirect, make_response,
-    url_for, jsonify
+    url_for, jsonify, json
 )
-from Post.app.extension import app, db
+from Post.app.extension import db
 from Post.app.models import Post, User, Comment, C_comment
 from Post.app.exception import AuthenticateFailed
 from Post.app.util.Token_generator import decode_token
 from Post.app.util.Cookie_generator import Manage_cookie
 from Post.app.util.Auth_Validate import Auth_Validate, Load_Token
 
-@app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
             Userid = request.form['Userid']
             Passwd = request.form['password']
+
             try:
                 user_info = User.query.get(Userid)
                 if user_info.check_password(Passwd):
@@ -30,7 +30,7 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/register', methods=['POST', 'GET'])
+
 def register():
     if request.method == 'POST':
         Userid = request.form.get("Userid")
@@ -42,8 +42,7 @@ def register():
         return redirect(url_for('login')), 301
     return render_template('register.html')
 
-
-@app.route('/logout', methods=['GET'])
+@Auth_Validate
 def logout():
     resp = make_response(redirect(url_for('index')))
     Cookie = Manage_cookie(resp)
@@ -52,7 +51,7 @@ def logout():
     return resp
 
 
-@app.route('/delete_account', methods=['POST', 'GET'])
+@Auth_Validate
 def delete_account():
     Token = Load_Token("Access_Token")
     user_info = User.query.filter_by(Userid=Token["userid"]).first()

@@ -18,6 +18,7 @@ def Auth_Validate(func):
 def Load_Token(Token_name):
     cookie = request.cookies.get(Token_name)
     Token = decode_token(cookie)
+
     return Token
 
 def Extend_access_Token():

@@ -2,32 +2,37 @@ import os
 import datetime
 from flask import (
     render_template, request, redirect,
-    url_for, jsonify, flash, Blueprint
+    url_for, jsonify, flash
 )
+from flask_restful import Resource
 from werkzeug.utils import secure_filename
-from Post.app.extension import app, db
-from Post.app.models import Post, Comment, C_comment, Files
+from Post.app.extension import db
+from Post.app.models import Post, Comment, C_comment
 from Post.app.util.Auth_Validate import Auth_Validate, Load_Token
-from Post.app.exception import AuthenticateFailed, NotFound
+from Post.app.exception import AuthenticateFailed
 from Post.config.app_config import allowed_file
 
 
-@app.route('/', methods=['GET'])
-def Index():
-    try:
-        Token = Load_Token('Access_Token')
-        user = Token['nickname']
-    except:
-        user = None
-    Page = request.args.get('page', type=int, default=1)
-    List = Post.query.order_by(Post.uuid.desc())
-    Post_list = List.paginate(Page, per_page=7)
-    return render_template("index2.html", post=Post_list, user=user)
+class HelloWorld(Resource):
+    def get(self):
+        return {'hello': 'world'}
 
 
-@app.route('/add', methods=['POST', 'GET'])
+class Index(Resource):
+    def Index(self):
+        try:
+            Token = Load_Token('Access_Token')
+            user = Token['nickname']
+        except:
+            user = None
+        Page = request.args.get('page', type=int, default=1)
+        List = Post.query.order_by(Post.uuid.desc())
+        Post_list = List.paginate(Page, per_page=7)
+        return render_template("index2.html", post=Post_list, user=user)
+
+
 @Auth_Validate
-def Add():
+def Add(self):
     try:
         Token = Load_Token('Access_Token')
         user = Token['nickname']
@@ -46,7 +51,7 @@ def Add():
             return redirect(request.url), 404
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            save_location = app.config['UPLOAD_FOLDER'] + '/' + user
+            # save_location = app.config['UPLOAD_FOLDER'] + '/' + user
         if title != '' and content != '':
 
             post = Post(title, content, now, user)
@@ -59,10 +64,6 @@ def Add():
     return render_template('add.html', user=user)
 
 
-Post_bp = Blueprint('post', __name__, url_prefix='/post')
-
-
-@Post_bp.route('/<int:uuid>', methods=['GET', 'POST'])
 def View_Post(uuid):
     try:
         Token = Load_Token('Access_Token')
@@ -98,7 +99,6 @@ def View_Post(uuid):
                            c_comment=c_comment, Previous=Previous, Next=Next)
 
 
-@app.route('/<int:uuid>/edit', methods=['POST', 'GET'])
 @Auth_Validate
 def edit(uuid):
     Token = Load_Token('Access_Token')
@@ -117,7 +117,6 @@ def edit(uuid):
         raise AuthenticateFailed()
 
 
-@app.route('/<int:uuid>/delete', methods=['GET'])
 @Auth_Validate
 def delete(uuid):
     Token = Load_Token('Access_Token')
